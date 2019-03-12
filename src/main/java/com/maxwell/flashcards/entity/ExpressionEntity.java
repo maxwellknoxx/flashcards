@@ -5,18 +5,24 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "word")
-public class WordEntity {
+@Table(name = "expression")
+public class ExpressionEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@Column(name = "word", nullable = false)
-	private String word;
+	@ManyToOne
+	@JoinColumn(name = "dictionary", nullable = false)
+	private DictionaryEntity dictionary;
+
+	@Column(name = "expression", nullable = false)
+	private String expression;
 
 	@Column(name = "meaning", nullable = false)
 	private String meaning;
@@ -35,12 +41,12 @@ public class WordEntity {
 		this.id = id;
 	}
 
-	public String getWord() {
-		return word;
+	public String getExpression() {
+		return expression;
 	}
 
-	public void setWord(String word) {
-		this.word = word;
+	public void setExpression(String expression) {
+		this.expression = expression;
 	}
 
 	public String getMeaning() {

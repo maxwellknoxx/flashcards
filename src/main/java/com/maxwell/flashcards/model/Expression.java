@@ -1,9 +1,9 @@
 package com.maxwell.flashcards.model;
 
-public class Word {
+public class Expression {
 
 	private Long id;
-	private String word;
+	private String expression;
 	private String meaning;
 	private int hits;
 	private int fails;
@@ -16,12 +16,12 @@ public class Word {
 		this.id = id;
 	}
 
-	public String getWord() {
-		return word;
+	public String getExpression() {
+		return expression;
 	}
 
-	public void setWord(String word) {
-		this.word = word;
+	public void setExpression(String expression) {
+		this.expression = expression;
 	}
 
 	public String getMeaning() {

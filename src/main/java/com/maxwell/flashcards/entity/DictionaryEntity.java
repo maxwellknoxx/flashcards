@@ -18,16 +18,19 @@ public class DictionaryEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
-	@OneToMany
+	@Column(name = "dictionary_name", nullable = false)
+	private String dictionaryName;
+
+	@OneToMany(mappedBy = "dictionary")
 	@Column(name = "words")
-	private List<WordEntity> words;
+	private List<ExpressionEntity> words;
 
 	@Column(name = "wrong_words")
 	private int wrongWords;
 
 	@Column(name = "hit_words")
 	private int hitWords;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -36,11 +39,19 @@ public class DictionaryEntity {
 		this.id = id;
 	}
 
-	public List<WordEntity> getWords() {
+	public String getDictionaryName() {
+		return dictionaryName;
+	}
+
+	public void setDictionaryName(String dictionaryName) {
+		this.dictionaryName = dictionaryName;
+	}
+
+	public List<ExpressionEntity> getWords() {
 		return words;
 	}
 
-	public void setWords(List<WordEntity> words) {
+	public void setWords(List<ExpressionEntity> words) {
 		this.words = words;
 	}
 

@@ -5,7 +5,8 @@ import java.util.List;
 public class Dictionary {
 
 	private Long id;
-	private List<Word> words;
+	private String dictionaryName;
+	private List<Expression> words;
 	private int wrongWords;
 	private int hitWords;
 
@@ -17,11 +18,19 @@ public class Dictionary {
 		this.id = id;
 	}
 
-	public List<Word> getWords() {
+	public String getDictionaryName() {
+		return dictionaryName;
+	}
+
+	public void setDictionaryName(String dictionaryName) {
+		this.dictionaryName = dictionaryName;
+	}
+
+	public List<Expression> getWords() {
 		return words;
 	}
 
-	public void setWords(List<Word> words) {
+	public void setWords(List<Expression> words) {
 		this.words = words;
 	}
 
