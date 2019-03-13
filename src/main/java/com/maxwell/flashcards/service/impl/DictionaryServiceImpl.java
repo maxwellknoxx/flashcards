@@ -14,42 +14,27 @@ public class DictionaryServiceImpl implements DictionaryService {
 
 	@Autowired
 	private DictionaryRepository repository;
-	
+
 	public void addDictionary(DictionaryEntity dictionary) {
 		repository.save(dictionary);
 	}
-	
+
 	public void removeDictionaryById(Long id) {
 		repository.deleteById(id);
 	}
-	
+
 	public void updateDictionary(DictionaryEntity dictionary) {
 		repository.save(dictionary);
 	}
-	
+
+	@Override
 	public List<DictionaryEntity> findAll() {
 		return repository.findAll();
 	}
-	
-	@Override
-	public int totalHitWords() {
-		int totalHitWords = 0;
-		
-		List<DictionaryEntity> dictionary = repository.findAll();
-		
-		totalHitWords = dictionary.get(0).getHitWords();
-		
-		dictionary.get(0).getWrongWords();
-		
-		return totalHitWords;
-	}
 
 	@Override
-	public int totalWrongWords() {
-		int totalWrongWords = 0;
-		
-		return totalWrongWords;
+	public DictionaryEntity findByDictionaryName(String dictionaryName) {
+		return repository.findByDictionaryName(dictionaryName);
 	}
-	
-	
+
 }

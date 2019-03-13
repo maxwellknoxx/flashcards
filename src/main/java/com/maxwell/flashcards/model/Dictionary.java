@@ -1,12 +1,9 @@
 package com.maxwell.flashcards.model;
 
-import java.util.List;
-
 public class Dictionary {
 
 	private Long id;
 	private String dictionaryName;
-	private List<Expression> words;
 	private int wrongWords;
 	private int hitWords;
 
@@ -24,14 +21,6 @@ public class Dictionary {
 
 	public void setDictionaryName(String dictionaryName) {
 		this.dictionaryName = dictionaryName;
-	}
-
-	public List<Expression> getWords() {
-		return words;
-	}
-
-	public void setWords(List<Expression> words) {
-		this.words = words;
 	}
 
 	public int getWrongWords() {

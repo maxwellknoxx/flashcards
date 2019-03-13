@@ -1,9 +1,13 @@
 package com.maxwell.flashcards.service;
 
+import java.util.List;
+
+import com.maxwell.flashcards.entity.DictionaryEntity;
+
 public interface DictionaryService {
 
-	int totalHitWords();
-
-	int totalWrongWords();
-
+	List<DictionaryEntity> findAll();
+	
+	DictionaryEntity findByDictionaryName(String dictionaryName);
+	
 }

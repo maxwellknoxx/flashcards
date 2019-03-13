@@ -9,5 +9,7 @@ import com.maxwell.flashcards.entity.DictionaryEntity;
 public interface DictionaryRepository extends JpaRepository<DictionaryEntity, Long> {
 
 	List<DictionaryEntity> findAll();
+	
+	DictionaryEntity findByDictionaryName(String dictionaryName);
 
 }

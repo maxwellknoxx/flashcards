@@ -1,13 +1,10 @@
 package com.maxwell.flashcards.entity;
 
-import java.util.List;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -20,10 +17,6 @@ public class DictionaryEntity {
 
 	@Column(name = "dictionary_name", nullable = false)
 	private String dictionaryName;
-
-	@OneToMany(mappedBy = "dictionary")
-	@Column(name = "words")
-	private List<ExpressionEntity> words;
 
 	@Column(name = "wrong_words")
 	private int wrongWords;
@@ -45,14 +38,6 @@ public class DictionaryEntity {
 
 	public void setDictionaryName(String dictionaryName) {
 		this.dictionaryName = dictionaryName;
-	}
-
-	public List<ExpressionEntity> getWords() {
-		return words;
-	}
-
-	public void setWords(List<ExpressionEntity> words) {
-		this.words = words;
 	}
 
 	public int getWrongWords() {
