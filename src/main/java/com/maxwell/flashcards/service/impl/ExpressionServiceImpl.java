@@ -15,19 +15,14 @@ public class ExpressionServiceImpl implements ExpressionService {
 	@Autowired
 	private ExpressionRepository repository;
 
-	public void addexpression(ExpressionEntity expression) {
-		try {
-			repository.save(expression);	
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
+	public ExpressionEntity addexpression(ExpressionEntity expression) {
+		return repository.save(expression);
 	}
 
 	public void removeExpressionById(Long id) {
 		repository.deleteById(id);
 	}
-	
+
 	public void updateExpression(ExpressionEntity expression) {
 		repository.save(expression);
 	}

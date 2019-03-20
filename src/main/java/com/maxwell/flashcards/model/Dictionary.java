@@ -4,7 +4,7 @@ public class Dictionary {
 
 	private Long id;
 	private String dictionaryName;
-	private int wrongWords;
+	private int failWords;
 	private int hitWords;
 
 	public Long getId() {
@@ -23,12 +23,12 @@ public class Dictionary {
 		this.dictionaryName = dictionaryName;
 	}
 
-	public int getWrongWords() {
-		return wrongWords;
+	public int getFailWords() {
+		return failWords;
 	}
 
-	public void setWrongWords(int wrongWords) {
-		this.wrongWords = wrongWords;
+	public void setFailWords(int failWords) {
+		this.failWords = failWords;
 	}
 
 	public int getHitWords() {
@@ -37,6 +37,14 @@ public class Dictionary {
 
 	public void setHitWords(int hitWords) {
 		this.hitWords = hitWords;
+	}
+
+	public int addHitWords() {
+		return this.hitWords = this.hitWords + 1;
+	}
+
+	public int addFailWords() {
+		return this.failWords = this.failWords + 1;
 	}
 
 }

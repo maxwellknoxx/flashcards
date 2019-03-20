@@ -8,9 +8,12 @@ import org.springframework.context.annotation.Bean;
 @SpringBootApplication
 public class FlashcardsApplication {
 
+	
+	//CRIAR FRONT END
 	public static void main(String[] args) {
 		SpringApplication.run(FlashcardsApplication.class, args);
 	}
+	
 	
 	@Bean
 	CommandLineRunner init() {

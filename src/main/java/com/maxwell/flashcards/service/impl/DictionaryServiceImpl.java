@@ -15,8 +15,8 @@ public class DictionaryServiceImpl implements DictionaryService {
 	@Autowired
 	private DictionaryRepository repository;
 
-	public void addDictionary(DictionaryEntity dictionary) {
-		repository.save(dictionary);
+	public DictionaryEntity addDictionary(DictionaryEntity dictionary) {
+		return repository.save(dictionary);
 	}
 
 	public void removeDictionaryById(Long id) {

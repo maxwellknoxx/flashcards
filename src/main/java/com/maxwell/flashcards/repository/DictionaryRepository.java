@@ -11,5 +11,7 @@ public interface DictionaryRepository extends JpaRepository<DictionaryEntity, Lo
 	List<DictionaryEntity> findAll();
 	
 	DictionaryEntity findByDictionaryName(String dictionaryName);
+	
+	DictionaryEntity findDictionaryById(Long id);
 
 }

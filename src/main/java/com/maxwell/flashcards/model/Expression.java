@@ -5,6 +5,8 @@ public class Expression {
 	private Long id;
 	private String expression;
 	private String meaning;
+	private Dictionary dictionary;
+	private String dictionaryIdentityKey;
 	private int hits;
 	private int fails;
 
@@ -30,6 +32,22 @@ public class Expression {
 
 	public void setMeaning(String meaning) {
 		this.meaning = meaning;
+	}
+
+	public Dictionary getDictionary() {
+		return dictionary;
+	}
+
+	public void setDictionary(Dictionary dictionary) {
+		this.dictionary = dictionary;
+	}
+
+	public String getDictionaryIdentityKey() {
+		return dictionaryIdentityKey;
+	}
+
+	public void setDictionaryIdentityKey(String dictionaryIdentityKey) {
+		this.dictionaryIdentityKey = dictionaryIdentityKey;
 	}
 
 	public int getHits() {

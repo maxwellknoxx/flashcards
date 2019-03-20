@@ -18,8 +18,8 @@ public class DictionaryEntity {
 	@Column(name = "dictionary_name", nullable = false)
 	private String dictionaryName;
 
-	@Column(name = "wrong_words")
-	private int wrongWords;
+	@Column(name = "fail_words")
+	private int failWords;
 
 	@Column(name = "hit_words")
 	private int hitWords;
@@ -40,12 +40,12 @@ public class DictionaryEntity {
 		this.dictionaryName = dictionaryName;
 	}
 
-	public int getWrongWords() {
-		return wrongWords;
+	public int getfailWords() {
+		return failWords;
 	}
 
-	public void setWrongWords(int wrongWords) {
-		this.wrongWords = wrongWords;
+	public void setfailWords(int failWords) {
+		this.failWords = failWords;
 	}
 
 	public int getHitWords() {
@@ -55,5 +55,5 @@ public class DictionaryEntity {
 	public void setHitWords(int hitWords) {
 		this.hitWords = hitWords;
 	}
-
+	
 }

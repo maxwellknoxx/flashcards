@@ -13,9 +13,20 @@ public class Utils {
 		dictionaryModel.setDictionaryName(dictionaryEntity.getDictionaryName());
 		dictionaryModel.setHitWords(dictionaryEntity.getHitWords());
 		dictionaryModel.setId(dictionaryEntity.getId());
-		dictionaryModel.setWrongWords(dictionaryEntity.getWrongWords());
+		dictionaryModel.setFailWords(dictionaryEntity.getfailWords());
 
 		return dictionaryModel;
+	}
+
+	public DictionaryEntity convertToEntity(Dictionary dictionary) {
+		DictionaryEntity dictionaryEntity = new DictionaryEntity();
+
+		dictionaryEntity.setDictionaryName(dictionary.getDictionaryName());
+		dictionaryEntity.setHitWords(dictionary.getHitWords());
+		dictionaryEntity.setId(dictionary.getId());
+		dictionaryEntity.setfailWords(dictionary.getFailWords());
+
+		return dictionaryEntity;
 	}
 
 	public Expression convertToModel(ExpressionEntity expressionEntity) {
@@ -26,8 +37,22 @@ public class Utils {
 		expression.setHits(expressionEntity.getHits());
 		expression.setId(expressionEntity.getId());
 		expression.setMeaning(expressionEntity.getMeaning());
+		expression.setDictionary(convertToModel(expressionEntity.getDictionary()));
 
 		return expression;
+	}
+
+	public ExpressionEntity convertToEntity(Expression expression) {
+		ExpressionEntity expressionEntity = new ExpressionEntity();
+
+		expressionEntity.setExpression(expression.getExpression());
+		expressionEntity.setFails(expression.getFails());
+		expressionEntity.setHits(expression.getHits());
+		expressionEntity.setId(expression.getId());
+		expressionEntity.setMeaning(expression.getMeaning());
+		expressionEntity.setDictionary(convertToEntity(expression.getDictionary()));
+
+		return expressionEntity;
 	}
 
 }
