@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,6 +19,7 @@ import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.service.impl.DictionaryServiceImpl;
 import com.maxwell.flashcards.util.Utils;
 
+@CrossOrigin(origins = "*")
 @RestController
 public class DictionaryController {
 
@@ -33,13 +35,8 @@ public class DictionaryController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/dictionary/findAll")
-	public ResponseEntity<Response<Dictionary>> findAll(BindingResult result) {
+	public ResponseEntity<Response<Dictionary>> findAll() {
 		Response<Dictionary> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		List<Dictionary> dictionaries = new ArrayList<>();
 

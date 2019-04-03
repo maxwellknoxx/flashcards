@@ -18,7 +18,7 @@ public class Utils {
 		return dictionaryModel;
 	}
 
-	public DictionaryEntity convertToEntity(Dictionary dictionary) {
+	public DictionaryEntity convertToEntity(Dictionary dictionary)  {
 		DictionaryEntity dictionaryEntity = new DictionaryEntity();
 
 		dictionaryEntity.setDictionaryName(dictionary.getDictionaryName());
@@ -37,6 +37,7 @@ public class Utils {
 		expression.setHits(expressionEntity.getHits());
 		expression.setId(expressionEntity.getId());
 		expression.setMeaning(expressionEntity.getMeaning());
+		expression.setDictionaryIdentityKey(expressionEntity.getDictionary().getId().toString());
 		expression.setDictionary(convertToModel(expressionEntity.getDictionary()));
 
 		return expression;

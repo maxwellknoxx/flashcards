@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 public class FlashcardsApplication {
 
 	
-	//CRIAR FRONT END
+	
 	public static void main(String[] args) {
 		SpringApplication.run(FlashcardsApplication.class, args);
 	}
