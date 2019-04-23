@@ -67,7 +67,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/expression/findByExpression")
+	@GetMapping(value = "/api/expression/findByExpression")
 	public ResponseEntity<Response<Expression>> findByExpression(@Valid @RequestBody Expression expressionToFind,
 			BindingResult result) {
 		Response<Expression> response = new Response<>();

@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,7 +36,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/dictionary/findAll")
+	@GetMapping(value = "/api/dictionary/findAll")
 	public ResponseEntity<Response<Dictionary>> findAll() {
 		Response<Dictionary> response = new Response<>();
 
@@ -60,7 +62,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/dictionary/findByDicionaryName")
+	@GetMapping(value = "/api/dictionary/findByDicionaryName")
 	public ResponseEntity<Response<Dictionary>> findByDictionaryName(@Valid @RequestParam Dictionary DictionaryToFind,
 			BindingResult result) {
 		Response<Dictionary> response = new Response<>();
@@ -124,7 +126,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/dictionary/update")
+	@PutMapping(value = "/api/dictionary/update")
 	public ResponseEntity<Response<Dictionary>> updateDictionary(@Valid @RequestBody Dictionary dictionary,
 			BindingResult result) {
 		Response<Dictionary> response = new Response<>();
@@ -183,7 +185,9 @@ public class DictionaryController {
 	 * @param dictionaryName
 	 * @return
 	 */
-	public List<Integer> totalHitFail(String dictionaryName) {
+	@GetMapping(value = "/api/dictionary/totalHitFail")
+	public ResponseEntity<Response<List<Integer>>> totalHitFail(String dictionaryName) {
+		Response<List<Integer>> response = new Response<>();
 		int totalHitWords = 0;
 		int totalFailWords = 0;
 		List<Integer> totals = new ArrayList<>();
@@ -195,7 +199,9 @@ public class DictionaryController {
 
 		totals.add(totalHitWords);
 		totals.add(totalFailWords);
+		
+		response.setData(totals);
 
-		return totals;
+		return ResponseEntity.ok(response);
 	}
 }
