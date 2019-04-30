@@ -10,4 +10,6 @@ public interface DictionaryService {
 	
 	DictionaryEntity findByDictionaryName(String dictionaryName);
 	
+	DictionaryEntity findDictionaryById(Long id);
+	
 }

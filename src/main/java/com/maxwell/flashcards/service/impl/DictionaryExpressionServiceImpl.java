@@ -1,5 +1,6 @@
 package com.maxwell.flashcards.service.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,11 @@ public class DictionaryExpressionServiceImpl implements DictionaryExpressionServ
 	public void updateHitsFails(DictionaryEntity dictionaryEntity, ExpressionEntity expressionEntity) {
 		repository.save(dictionaryEntity);
 		expressionRepository.save(expressionEntity);
+	}
+
+	@Override
+	public List<ExpressionEntity> findByDictionaryId(Long dictionariId) {
+		return expressionRepository.findByDictionaryId(dictionariId);
 	}
 
 }

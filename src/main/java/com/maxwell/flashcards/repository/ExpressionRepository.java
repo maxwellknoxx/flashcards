@@ -13,5 +13,7 @@ public interface ExpressionRepository extends JpaRepository<ExpressionEntity, Lo
 	List<ExpressionEntity> findAll();
 
 	ExpressionEntity findByExpression(String expression);
+	
+	List<ExpressionEntity> findByDictionaryId(Long dictionariId);
 
 }

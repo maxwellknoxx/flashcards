@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +46,25 @@ public class DictionaryController {
 		try {
 			service.findAll().forEach(dictionariesFromDB -> dictionaries.add(util.convertToModel(dictionariesFromDB)));
 			response.setListData(dictionaries);
+			response.setMessage("Resource found");
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.getErrors().add(e.getCause().toString());
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping(value = "/api/dictionary/findDictionaryById/{id}")
+	public ResponseEntity<Response<Dictionary>> findDictionaryById(@PathVariable(value = "id") Long id) {
+		Response<Dictionary> response = new Response<>();
+
+		Dictionary dictionary = new Dictionary();
+
+		try {
+			dictionary = util.convertToModel(service.findDictionaryById(id));
+			response.setData(dictionary);
 			response.setMessage("Resource found");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -199,7 +219,7 @@ public class DictionaryController {
 
 		totals.add(totalHitWords);
 		totals.add(totalFailWords);
-		
+
 		response.setData(totals);
 
 		return ResponseEntity.ok(response);

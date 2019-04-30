@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,6 +91,33 @@ public class ExpressionController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	/**
+	 * 
+	 * @param dictionary
+	 * @param result
+	 * @return
+	 */
+	@GetMapping(value = "/api/expression/findByDictionaryId/{id}")
+	public ResponseEntity<Response<Expression>> findByDictionaryId(@PathVariable(value="id") long id) {
+		Response<Expression> response = new Response<>();
+
+		List<Expression> list = new ArrayList<>();
+		try {
+			dictionaryExpressionService.findByDictionaryId(id)
+					.forEach(expressionFromDB -> list.add(util.convertToModel(expressionFromDB)));
+			response.setListData(list);
+			response.setMessage("Resouce found");
+			System.out.println(list.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.getErrors().add(e.getCause().toString());
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		return ResponseEntity.ok(response);
+	}
+
 
 	/**
 	 * Adds the current expression to the dictionary
@@ -107,7 +135,6 @@ public class ExpressionController {
 			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
-
 
 		try {
 			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));

@@ -37,4 +37,9 @@ public class DictionaryServiceImpl implements DictionaryService {
 		return repository.findByDictionaryName(dictionaryName);
 	}
 
+	@Override
+	public DictionaryEntity findDictionaryById(Long id) {
+		return repository.findDictionaryById(id);
+	}
+
 }
