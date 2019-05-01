@@ -2,18 +2,10 @@ package com.maxwell.flashcards.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "user")
@@ -28,14 +20,7 @@ public class UserEntity {
 
 	@Column(name = "password", nullable = false)
 	private String password;
-
-	//UM USUARIO PODE TER VARIOS DICIONARIOS 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "dictionary_id")
-	@OnDelete(action = OnDeleteAction.CASCADE)
-	@JsonIgnore
-	private DictionaryEntity dictionary;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -58,14 +43,6 @@ public class UserEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public DictionaryEntity getDictionary() {
-		return dictionary;
-	}
-
-	public void setDictionary(DictionaryEntity dictionary) {
-		this.dictionary = dictionary;
 	}
 
 }

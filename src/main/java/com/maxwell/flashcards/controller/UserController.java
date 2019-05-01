@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,23 +42,27 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(value = "/api/user/login")
+	@PostMapping(value = "/api/user/login")
 	public ResponseEntity<Response<UserEntity>> login(@Valid @RequestBody UserEntity user, BindingResult result) {
 		Response<UserEntity> response = new Response<UserEntity>();
 		UserEntity userFromDB = new UserEntity();
 
 		if (result.hasErrors()) {
 			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
+			response.setLogged(false);
 			return ResponseEntity.badRequest().body(response);
 		}
 
 		try {
 			userFromDB = service.findByUserName(user.getUserName());
 			if (userFromDB.getPassword().equals(user.getPassword())) {
+				response.setData(userFromDB);
 				response.setMessage("Logged in");
+				response.setLogged(true);
 			}
 		} catch (Exception e) {
 			response.getErrors().add(e.getMessage());
+			response.setLogged(false);
 			return ResponseEntity.badRequest().body(response);
 		}
 

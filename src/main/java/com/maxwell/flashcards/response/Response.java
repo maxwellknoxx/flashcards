@@ -9,6 +9,7 @@ public class Response<T> {
 	private List<T> listData;
 	private String message;
 	private List<String> errors;
+	private Boolean logged;
 
 	public Response() {
 	}
@@ -49,6 +50,14 @@ public class Response<T> {
 
 	public void setErros(List<String> errors) {
 		this.errors = errors;
+	}
+
+	public Boolean getLogged() {
+		return logged;
+	}
+
+	public void setLogged(Boolean logged) {
+		this.logged = logged;
 	}
 
 }
