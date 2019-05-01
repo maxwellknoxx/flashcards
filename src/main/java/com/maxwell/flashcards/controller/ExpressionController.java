@@ -98,8 +98,8 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@GetMapping(value = "/api/expression/findByDictionaryId/{id}")
-	public ResponseEntity<Response<Expression>> findByDictionaryId(@PathVariable(value="id") long id) {
+	@GetMapping(value = "/api/expression/findExpressionsByDictionaryId/{id}")
+	public ResponseEntity<Response<Expression>> findExpressionsByDictionaryId(@PathVariable(value="id") long id) {
 		Response<Expression> response = new Response<>();
 
 		List<Expression> list = new ArrayList<>();
