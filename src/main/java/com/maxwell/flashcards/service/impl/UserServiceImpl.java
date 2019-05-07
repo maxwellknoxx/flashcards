@@ -17,10 +17,21 @@ public class UserServiceImpl implements UserService {
 	public UserEntity save(UserEntity user) {
 		return repository.save(user);
 	}
+	
+	public UserEntity update(UserEntity user) {
+		return repository.save(user);
+	}
 
 	@Override
 	public UserEntity findByUserName(String userName) {
 		return repository.findByUserName(userName);
 	}
+
+	@Override
+	public UserEntity findUserByEmail(String email) {
+		return repository.findUserByEmail(email);
+	}
+	
+	
 
 }

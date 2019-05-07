@@ -9,5 +9,7 @@ import com.maxwell.flashcards.entity.UserEntity;
 public interface UserRepository  extends JpaRepository<UserEntity, Long> {
 	
 	UserEntity findByUserName(String userName);
+	
+	UserEntity findUserByEmail(String email);
 
 }

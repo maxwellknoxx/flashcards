@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.maxwell.flashcards.entity.DictionaryEntity;
+import com.maxwell.flashcards.entity.UserDictionaryEntity;
 import com.maxwell.flashcards.model.Dictionary;
 import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.service.impl.DictionaryServiceImpl;
+import com.maxwell.flashcards.service.impl.UserDictionaryServiceImpl;
 import com.maxwell.flashcards.util.Utils;
 
 @CrossOrigin(origins = "*")
@@ -28,6 +31,9 @@ public class DictionaryController {
 
 	@Autowired
 	private DictionaryServiceImpl service;
+
+	@Autowired
+	private UserDictionaryServiceImpl userDictionaryService;
 
 	Utils util = new Utils();
 
@@ -118,16 +124,25 @@ public class DictionaryController {
 	public ResponseEntity<Response<Dictionary>> addDictionary(@Valid @RequestBody Dictionary dictionary,
 			BindingResult result) {
 		Response<Dictionary> response = new Response<>();
+		DictionaryEntity entity =  new DictionaryEntity();
+		UserDictionaryEntity userDictionary = new UserDictionaryEntity();
+		Long userId = dictionary.getIdUser();
 
 		if (result.hasErrors()) {
 			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
 			return ResponseEntity.badRequest().body(response);
 		}
+		
+		entity = util.convertToEntity(dictionary);
 
-		dictionary.setDictionaryName(dictionary.getDictionaryName());
 
 		try {
-			dictionary = util.convertToModel(service.addDictionary(util.convertToEntity(dictionary)));
+			dictionary = util.convertToModel(service.addDictionary(entity));
+			if (dictionary.getId() != null) {
+				userDictionary.setDictionaryId(dictionary.getId());
+				userDictionary.setUserId(userId);
+				userDictionaryService.save(userDictionary);
+			}
 			response.setData(dictionary);
 			response.setMessage("Sucess, dictionary " + dictionary.getDictionaryName() + " has been added!");
 		} catch (Exception e) {

@@ -8,4 +8,6 @@ public interface UserService {
 	
 	UserEntity findByUserName(String userName);
 	
+	UserEntity findUserByEmail(String email);
+	
 }

@@ -6,6 +6,7 @@ public class Dictionary {
 	private String dictionaryName;
 	private int failWords;
 	private int hitWords;
+	private Long idUser;
 
 	public Long getId() {
 		return id;
@@ -45,6 +46,14 @@ public class Dictionary {
 
 	public int addFailWords() {
 		return this.failWords = this.failWords + 1;
+	}
+
+	public Long getIdUser() {
+		return idUser;
+	}
+
+	public void setIdUser(Long idUser) {
+		this.idUser = idUser;
 	}
 
 }

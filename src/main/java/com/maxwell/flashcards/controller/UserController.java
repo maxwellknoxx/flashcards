@@ -33,6 +33,7 @@ public class UserController {
 		try {
 			service.save(user);
 			response.setMessage("Success" + user.getUserName() + " Has been added!");
+			response.setLogged(true);
 			response.setData(user);
 		} catch (Exception e) {
 			response.getErrors().add(e.getMessage());
@@ -42,6 +43,29 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}
 
+	@PostMapping(value = "/api/user/update")
+	public ResponseEntity<Response<UserEntity>> update(@Valid @RequestBody UserEntity user, BindingResult result) {
+		Response<UserEntity> response = new Response<UserEntity>();
+
+		if (result.hasErrors()) {
+			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
+			return ResponseEntity.badRequest().body(response);
+		}
+
+		try {
+			service.update(user);
+			response.setMessage("Success" + user.getUserName() + " Has been added!");
+			response.setData(user);
+		} catch (Exception e) {
+			response.getErrors().add(e.getMessage());
+			return ResponseEntity.badRequest().body(response);
+		}
+		
+		
+		
+		return ResponseEntity.ok(response);
+	}
+	
 	@PostMapping(value = "/api/user/login")
 	public ResponseEntity<Response<UserEntity>> login(@Valid @RequestBody UserEntity user, BindingResult result) {
 		Response<UserEntity> response = new Response<UserEntity>();
