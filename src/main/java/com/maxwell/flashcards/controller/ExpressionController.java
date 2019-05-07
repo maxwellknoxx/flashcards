@@ -1,6 +1,7 @@
 package com.maxwell.flashcards.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -106,6 +107,7 @@ public class ExpressionController {
 		try {
 			dictionaryExpressionService.findByDictionaryId(id)
 					.forEach(expressionFromDB -> list.add(util.convertToModel(expressionFromDB)));
+			Collections.shuffle(list);
 			response.setListData(list);
 			response.setMessage("Resouce found");
 			System.out.println(list.toString());
@@ -285,6 +287,8 @@ public class ExpressionController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	
 
 	/**
 	 * Gets the dictionary converted to Model
