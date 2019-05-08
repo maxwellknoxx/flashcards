@@ -1,5 +1,7 @@
 package com.maxwell.flashcards.service.impl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +14,16 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository repository;
+	
+	
 
 	@Override
 	public UserEntity save(UserEntity user) {
 		return repository.save(user);
+	}
+	
+	public Optional<UserEntity> findUserById(Long id) {
+		return repository.findById(id);
 	}
 	
 	public UserEntity update(UserEntity user) {

@@ -9,7 +9,7 @@ public class Response<T> {
 	private List<T> listData;
 	private String message;
 	private List<String> errors;
-	private Boolean logged;
+	private Boolean status;
 
 	public Response() {
 	}
@@ -52,12 +52,12 @@ public class Response<T> {
 		this.errors = errors;
 	}
 
-	public Boolean getLogged() {
-		return logged;
+	public Boolean getStatus() {
+		return status;
 	}
 
-	public void setLogged(Boolean logged) {
-		this.logged = logged;
+	public void setStatus(Boolean status) {
+		this.status = status;
 	}
 
 }
