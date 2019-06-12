@@ -27,6 +27,9 @@ public class UserEntity {
 	@Column(name = "answer", nullable = false)
 	private String answer;
 
+	@Column(name = "is_logged", nullable = true)
+	private Boolean isLogged;
+
 	public Long getId() {
 		return id;
 	}
@@ -65,6 +68,14 @@ public class UserEntity {
 
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	public Boolean getIsLogged() {
+		return isLogged;
+	}
+
+	public void setIsLogged(Boolean isLogged) {
+		this.isLogged = isLogged;
 	}
 
 }
