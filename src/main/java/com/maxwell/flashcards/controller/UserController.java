@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.UserEntity;
+import com.maxwell.flashcards.model.Data;
 import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
@@ -57,9 +58,10 @@ public class UserController {
 	}
 
 	@PostMapping(value = "/api/user/login")
-	public ResponseEntity<Response<UserEntity>> login(@Valid @RequestBody UserEntity user) {
-		Response<UserEntity> response = new Response<UserEntity>();
+	public ResponseEntity<Response<Data>> login(@Valid @RequestBody UserEntity user) {
+		Response<Data> response = new Response<Data>();
 		UserEntity userFromDB = new UserEntity();
+		Data data = new Data();
 
 		try {
 			userFromDB = service.findByUserName(user.getUserName());
@@ -67,9 +69,9 @@ public class UserController {
 				user = userFromDB;
 				user.setIsLogged(true);
 				update(user);
-				userFromDB.setPassword("");
-				userFromDB.setIsLogged(true);
-				response.setData(userFromDB);
+				data.setId(userFromDB.getId());
+				data.setStatus(true);
+				response.setData(data);
 				response = responseUtils.setMessages(response, "Logged in", true);
 			} else {
 				response = responseUtils.setMessages(response, "Sorry, user login does not match", false);
