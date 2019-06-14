@@ -27,12 +27,16 @@ public class UserController {
 	ResponseUtils responseUtils = new ResponseUtils();
 
 	@PostMapping(value = "/api/user/save")
-	public ResponseEntity<Response<UserEntity>> addUser(@Valid @RequestBody UserEntity user) {
-		Response<UserEntity> response = new Response<UserEntity>();
+	public ResponseEntity<Response<Data>> addUser(@Valid @RequestBody UserEntity user) {
+		Response<Data> response = new Response<Data>();
+		Data data = new Data();
+		user.setIsLogged(true);
 
 		try {
 			service.save(user);
-			response.setData(user);
+			data.setId(user.getId());
+			data.setStatus(true);
+			response.setData(data);
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been added!", true);
 		} catch (Exception e) {
 			return responseUtils.setExceptionMessage(response, e);
@@ -106,19 +110,20 @@ public class UserController {
 	}
 
 	@GetMapping(value = "/api/user/isLogged/{id}")
-	public ResponseEntity<Response<UserEntity>> isLogged(@PathVariable(name = "id") Long id) {
-		Response<UserEntity> response = new Response<UserEntity>();
+	public ResponseEntity<Response<Data>> isLogged(@PathVariable(name = "id") Long id) {
+		Response<Data> response = new Response<Data>();
 		UserEntity userFromDB = new UserEntity();
+		Data data = new Data();
 
 		try {
 			userFromDB = service.findUserById(id).orElse(null);
 			if (userFromDB != null && userFromDB.getIsLogged().equals(true)) {
-				userFromDB.setPassword("");
-				userFromDB.setIsLogged(true);
-				response.setStatus(true);
-				response.setData(userFromDB);
+				data.setId(userFromDB.getId());
+				data.setStatus(true);
+				response.setData(data);
+				response = responseUtils.setMessages(response, "User is logged", true);
 			} else {
-				response = responseUtils.setMessages(response, "User not found", false);
+				response = responseUtils.setMessages(response, "User is not logged", false);
 			}
 		} catch (Exception e) {
 			return responseUtils.setExceptionMessage(response, e);

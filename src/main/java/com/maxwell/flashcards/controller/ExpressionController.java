@@ -8,7 +8,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maxwell.flashcards.model.Dictionary;
 import com.maxwell.flashcards.model.Expression;
 import com.maxwell.flashcards.response.Response;
+import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.DictionaryExpressionServiceImpl;
 import com.maxwell.flashcards.service.impl.ExpressionServiceImpl;
 import com.maxwell.flashcards.util.Utils;
@@ -33,6 +33,8 @@ public class ExpressionController {
 
 	@Autowired
 	private DictionaryExpressionServiceImpl dictionaryExpressionService;
+
+	ResponseUtils responseUtils = new ResponseUtils();
 
 	Utils util = new Utils();
 
@@ -51,11 +53,9 @@ public class ExpressionController {
 		try {
 			service.findAll().forEach(expressionFromDB -> list.add(util.convertToModel(expressionFromDB)));
 			response.setListData(list);
-			response.setMessage("Resouce found");
+			response = responseUtils.setMessages(response, "Resource found", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -70,29 +70,21 @@ public class ExpressionController {
 	 * @return
 	 */
 	@GetMapping(value = "/api/expression/findByExpression")
-	public ResponseEntity<Response<Expression>> findByExpression(@Valid @RequestBody Expression expressionToFind,
-			BindingResult result) {
+	public ResponseEntity<Response<Expression>> findByExpression(@Valid @RequestBody Expression expressionToFind) {
 		Response<Expression> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		Expression expression = null;
 		try {
 			expression = util.convertToModel(service.findByExpression(expressionToFind.getExpression()));
 			response.setData(expression);
-			response.setMessage("Resouce found");
+			response = responseUtils.setMessages(response, "Resource found", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
 	}
-	
+
 	/**
 	 * 
 	 * @param dictionary
@@ -100,7 +92,7 @@ public class ExpressionController {
 	 * @return
 	 */
 	@GetMapping(value = "/api/expression/findExpressionsByDictionaryId/{id}")
-	public ResponseEntity<Response<Expression>> findExpressionsByDictionaryId(@PathVariable(value="id") long id) {
+	public ResponseEntity<Response<Expression>> findExpressionsByDictionaryId(@PathVariable(value = "id") long id) {
 		Response<Expression> response = new Response<>();
 
 		List<Expression> list = new ArrayList<>();
@@ -109,17 +101,13 @@ public class ExpressionController {
 					.forEach(expressionFromDB -> list.add(util.convertToModel(expressionFromDB)));
 			Collections.shuffle(list);
 			response.setListData(list);
-			response.setMessage("Resouce found");
-			System.out.println(list.toString());
+			response = responseUtils.setMessages(response, "Resource found", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
 	}
-
 
 	/**
 	 * Adds the current expression to the dictionary
@@ -129,25 +117,18 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/expression/addExpression")
-	public ResponseEntity<Response<Expression>> addExpression(@Valid @RequestBody Expression expression,
-			BindingResult result) {
+	public ResponseEntity<Response<Expression>> addExpression(@Valid @RequestBody Expression expression) {
 		Response<Expression> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		try {
 			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
 			expression.setDictionary(dictionary);
 			expression = util.convertToModel(service.addexpression(util.convertToEntity(expression)));
 			response.setData(expression);
-			response.setMessage("Sucess, " + expression.getExpression() + " has been added!");
+			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been added!",
+					true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -161,25 +142,18 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PutMapping(value = "/api/expression/update")
-	public ResponseEntity<Response<Expression>> updateExpression(@Valid @RequestBody Expression expression,
-			BindingResult result) {
+	public ResponseEntity<Response<Expression>> updateExpression(@Valid @RequestBody Expression expression) {
 		Response<Expression> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		try {
 			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
 			expression.setDictionary(dictionary);
 			service.updateExpression(util.convertToEntity(expression));
 			response.setData(expression);
-			response.setMessage("Sucess, " + expression.getExpression() + " has been updated!");
+			response = responseUtils.setMessages(response,
+					"Sucess, " + expression.getExpression() + " has been updated!", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -193,25 +167,18 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/expression/remove")
-	public ResponseEntity<Response<Expression>> removeExpression(@Valid @RequestBody Expression expression,
-			BindingResult result) {
+	public ResponseEntity<Response<Expression>> removeExpression(@Valid @RequestBody Expression expression) {
 		Response<Expression> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		try {
 			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
 			expression.setDictionary(dictionary);
 			service.removeExpressionById(expression.getId());
 			response.setData(expression);
-			response.setMessage("Sucess, " + expression.getExpression() + " has been removed!");
+			response = responseUtils.setMessages(response,
+					"Sucess, " + expression.getExpression() + " has been removed!", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -225,14 +192,8 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/expression/hit")
-	public ResponseEntity<Response<Expression>> markAsHit(@Valid @RequestBody Expression expression,
-			BindingResult result) {
+	public ResponseEntity<Response<Expression>> markAsHit(@Valid @RequestBody Expression expression) {
 		Response<Expression> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		try {
 			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
@@ -242,11 +203,10 @@ public class ExpressionController {
 			dictionaryExpressionService.updateHitsFails(util.convertToEntity(dictionary),
 					util.convertToEntity(expression));
 			response.setData(expression);
-			response.setMessage("Sucess, " + expression.getExpression() + " has been hit!");
+			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been hit!",
+					true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -260,14 +220,8 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/expression/fail")
-	public ResponseEntity<Response<Expression>> markAsFail(@Valid @RequestBody Expression expression,
-			BindingResult result) {
+	public ResponseEntity<Response<Expression>> markAsFail(@Valid @RequestBody Expression expression) {
 		Response<Expression> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		try {
 			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
@@ -278,17 +232,14 @@ public class ExpressionController {
 					util.convertToEntity(expression));
 
 			response.setData(expression);
-			response.setMessage("Sucess, " + expression.getExpression() + " has been fail!");
+			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been fail!",
+					true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
 	}
-	
-	
 
 	/**
 	 * Gets the dictionary converted to Model

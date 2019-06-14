@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +20,7 @@ import com.maxwell.flashcards.entity.DictionaryEntity;
 import com.maxwell.flashcards.entity.UserDictionaryEntity;
 import com.maxwell.flashcards.model.Dictionary;
 import com.maxwell.flashcards.response.Response;
+import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.DictionaryServiceImpl;
 import com.maxwell.flashcards.service.impl.UserDictionaryServiceImpl;
 import com.maxwell.flashcards.util.Utils;
@@ -34,6 +34,8 @@ public class DictionaryController {
 
 	@Autowired
 	private UserDictionaryServiceImpl userDictionaryService;
+	
+	ResponseUtils responseUtils = new ResponseUtils();
 
 	Utils util = new Utils();
 
@@ -52,11 +54,9 @@ public class DictionaryController {
 		try {
 			service.findAll().forEach(dictionariesFromDB -> dictionaries.add(util.convertToModel(dictionariesFromDB)));
 			response.setListData(dictionaries);
-			response.setMessage("Resource found");
+			response = responseUtils.setMessages(response, "Resource found", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -71,11 +71,9 @@ public class DictionaryController {
 		try {
 			dictionary = util.convertToModel(service.findDictionaryById(id));
 			response.setData(dictionary);
-			response.setMessage("Resource found");
+			response = responseUtils.setMessages(response, "Resource found", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -89,25 +87,16 @@ public class DictionaryController {
 	 * @return
 	 */
 	@GetMapping(value = "/api/dictionary/findByDicionaryName")
-	public ResponseEntity<Response<Dictionary>> findByDictionaryName(@Valid @RequestParam Dictionary DictionaryToFind,
-			BindingResult result) {
+	public ResponseEntity<Response<Dictionary>> findByDictionaryName(@Valid @RequestParam Dictionary DictionaryToFind) {
 		Response<Dictionary> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
-
 		Dictionary dictionary = new Dictionary();
 
 		try {
 			dictionary = util.convertToModel(service.findByDictionaryName(DictionaryToFind.getDictionaryName()));
 			response.setData(dictionary);
-			response.setMessage("Resource found");
+			response = responseUtils.setMessages(response, "Resource found", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -121,17 +110,11 @@ public class DictionaryController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/dictionary/addDictionary")
-	public ResponseEntity<Response<Dictionary>> addDictionary(@Valid @RequestBody Dictionary dictionary,
-			BindingResult result) {
+	public ResponseEntity<Response<Dictionary>> addDictionary(@Valid @RequestBody Dictionary dictionary) {
 		Response<Dictionary> response = new Response<>();
 		DictionaryEntity entity =  new DictionaryEntity();
 		UserDictionaryEntity userDictionary = new UserDictionaryEntity();
 		Long userId = dictionary.getIdUser();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 		
 		entity = util.convertToEntity(dictionary);
 
@@ -142,13 +125,11 @@ public class DictionaryController {
 				userDictionary.setDictionaryId(dictionary.getId());
 				userDictionary.setUserId(userId);
 				userDictionaryService.save(userDictionary);
+				response.setData(dictionary);
+				response = responseUtils.setMessages(response, "Sucess, dictionary " + dictionary.getDictionaryName() + " has been added!", true);
 			}
-			response.setData(dictionary);
-			response.setMessage("Sucess, dictionary " + dictionary.getDictionaryName() + " has been added!");
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -162,23 +143,15 @@ public class DictionaryController {
 	 * @return
 	 */
 	@PutMapping(value = "/api/dictionary/update")
-	public ResponseEntity<Response<Dictionary>> updateDictionary(@Valid @RequestBody Dictionary dictionary,
-			BindingResult result) {
+	public ResponseEntity<Response<Dictionary>> updateDictionary(@Valid @RequestBody Dictionary dictionary) {
 		Response<Dictionary> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
 
 		try {
 			service.updateDictionary(util.convertToEntity(dictionary));
 			response.setData(dictionary);
-			response.setMessage("Sucess, dictionary " + dictionary.getDictionaryName() + " has been updated!");
+			response = responseUtils.setMessages(response, "Sucess, dictionary " + dictionary.getDictionaryName() + " has been updated!", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);
@@ -192,23 +165,17 @@ public class DictionaryController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/dictionary/remove")
-	public ResponseEntity<Response<Dictionary>> removeDictionary(@Valid @RequestBody Dictionary dictionary,
-			BindingResult result) {
+	public ResponseEntity<Response<Dictionary>> removeDictionary(@Valid @RequestBody Dictionary dictionary) {
 		Response<Dictionary> response = new Response<>();
-
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
+		Long id = dictionary.getId();
 
 		try {
-			service.removeDictionaryById(dictionary.getId());
+			service.removeDictionaryById(id);
+			userDictionaryService.remove(id);
 			response.setData(dictionary);
-			response.setMessage("Sucess, dictionary " + dictionary.getDictionaryName() + " has been removed!");
+			response = responseUtils.setMessages(response, "Sucess, dictionary " + dictionary.getDictionaryName() + " has been removed!", true);
 		} catch (Exception e) {
-			e.printStackTrace();
-			response.getErrors().add(e.getCause().toString());
-			return ResponseEntity.badRequest().body(response);
+			return responseUtils.setExceptionMessage(response, e);
 		}
 
 		return ResponseEntity.ok(response);

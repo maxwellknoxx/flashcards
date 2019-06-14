@@ -39,5 +39,9 @@ public class UserDictionaryServiceImpl implements UserDictionaryService {
 		return repository.save(userDictionary);
 	}
 	
+	public void remove(Long id) {
+		repository.deleteById(findByDictionaryId(id).getId());
+	}
+	
 }
 
