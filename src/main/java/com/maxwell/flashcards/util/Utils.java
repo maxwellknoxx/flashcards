@@ -7,7 +7,7 @@ import com.maxwell.flashcards.model.Expression;
 
 public class Utils {
 
-	public Dictionary convertToModel(DictionaryEntity dictionaryEntity) {
+	public Dictionary convertToModel(DictionaryEntity dictionaryEntity)  {
 		Dictionary dictionaryModel = new Dictionary();
 
 		dictionaryModel.setDictionaryName(dictionaryEntity.getDictionaryName());
@@ -29,7 +29,7 @@ public class Utils {
 		return dictionaryEntity;
 	}
 
-	public Expression convertToModel(ExpressionEntity expressionEntity) {
+	public Expression convertToModel(ExpressionEntity expressionEntity)  {
 		Expression expression = new Expression();
 
 		expression.setExpression(expressionEntity.getExpression());
@@ -43,7 +43,7 @@ public class Utils {
 		return expression;
 	}
 
-	public ExpressionEntity convertToEntity(Expression expression) {
+	public ExpressionEntity convertToEntity(Expression expression)  {
 		ExpressionEntity expressionEntity = new ExpressionEntity();
 
 		expressionEntity.setExpression(expression.getExpression());

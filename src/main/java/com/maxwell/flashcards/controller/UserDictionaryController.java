@@ -20,6 +20,7 @@ import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.DictionaryExpressionServiceImpl;
 import com.maxwell.flashcards.service.impl.UserDictionaryServiceImpl;
+import com.maxwell.flashcards.exception.ResourceNotFoundException;
 
 @CrossOrigin("*")
 @RestController
@@ -43,9 +44,9 @@ public class UserDictionaryController {
 			list = service.findAllDictionaryByUserId(id);
 			ListUserDictionary = findAll(list);
 			response.setListData(ListUserDictionary);
-			response = responseUtils.setMessages(response, "Resource found", true);
+			response = responseUtils.setMessages(response, "Resource found", "UserDictionaryController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -73,9 +74,9 @@ public class UserDictionaryController {
 		try {
 			userDictionary = service.save(userDictionary);
 			response.setData(userDictionary);
-			response = responseUtils.setMessages(response, "Saved", true);
+			response = responseUtils.setMessages(response, "Saved", "UserDictionaryController",  true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);

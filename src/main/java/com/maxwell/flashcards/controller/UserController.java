@@ -3,12 +3,14 @@ package com.maxwell.flashcards.controller;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.UserEntity;
@@ -16,6 +18,7 @@ import com.maxwell.flashcards.model.Data;
 import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
+import com.maxwell.flashcards.exception.ResourceNotFoundException;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -37,9 +40,10 @@ public class UserController {
 			data.setId(user.getId());
 			data.setStatus(true);
 			response.setData(data);
-			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been added!", true);
+			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been added!",
+					"UserController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -53,9 +57,9 @@ public class UserController {
 			service.update(user);
 			response.setData(user);
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been updated!",
-					true);
+					"UserController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -76,12 +80,13 @@ public class UserController {
 				data.setId(userFromDB.getId());
 				data.setStatus(true);
 				response.setData(data);
-				response = responseUtils.setMessages(response, "Logged in", true);
+				response = responseUtils.setMessages(response, "Logged in", "UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "Sorry, user login does not match", false);
+				response = responseUtils.setMessages(response, "Sorry, user login does not match", "UserController",
+						false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -91,24 +96,25 @@ public class UserController {
 	public ResponseEntity<Response<UserEntity>> logout(@PathVariable(name = "id") Long id) {
 		Response<UserEntity> response = new Response<UserEntity>();
 		UserEntity user = new UserEntity();
-		
+
 		try {
 			user = service.findUserById(id).orElse(null);
-			if(user != null) {
+			if (user != null) {
 				user.setIsLogged(false);
 				user = service.update(user);
 				response.setData(user);
-				response = responseUtils.setMessages(response, "User logged out", true);
+				response = responseUtils.setMessages(response, "User logged out", "UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "User not found", false);
+				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
 	}
 
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@GetMapping(value = "/api/user/isLogged/{id}")
 	public ResponseEntity<Response<Data>> isLogged(@PathVariable(name = "id") Long id) {
 		Response<Data> response = new Response<Data>();
@@ -121,12 +127,12 @@ public class UserController {
 				data.setId(userFromDB.getId());
 				data.setStatus(true);
 				response.setData(data);
-				response = responseUtils.setMessages(response, "User is logged", true);
+				response = responseUtils.setMessages(response, "User is logged", "UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "User is not logged", false);
+				response = responseUtils.setMessages(response, "User is not logged", "UserController", false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -142,12 +148,12 @@ public class UserController {
 			if (userFromDB != null) {
 				response.setData(userFromDB);
 				response = responseUtils.setMessages(response, "User " + userFromDB.getUserName() + " has been found",
-						true);
+						"UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "User not found", false);
+				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -164,12 +170,12 @@ public class UserController {
 				response.setData(userFromDB);
 				response.setMessage("User " + userFromDB.getUserName() + " has been found");
 				response = responseUtils.setMessages(response, "User " + userFromDB.getUserName() + " has been found",
-						true);
+						"UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "User not found", false);
+				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -186,12 +192,12 @@ public class UserController {
 				userFromDB.setPassword("");
 				response.setData(userFromDB);
 				response = responseUtils.setMessages(response, "User " + userFromDB.getUserName() + " has been found",
-						true);
+						"UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "User not found", false);
+				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -208,12 +214,12 @@ public class UserController {
 				userFromDB.setPassword(user.getPassword());
 				service.save(userFromDB);
 				response.setData(userFromDB);
-				response = responseUtils.setMessages(response, "Password has been changed", true);
+				response = responseUtils.setMessages(response, "Password has been changed", "UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "User not found", false);
+				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);

@@ -23,6 +23,7 @@ import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.DictionaryExpressionServiceImpl;
 import com.maxwell.flashcards.service.impl.ExpressionServiceImpl;
 import com.maxwell.flashcards.util.Utils;
+import com.maxwell.flashcards.exception.ResourceNotFoundException;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -37,29 +38,6 @@ public class ExpressionController {
 	ResponseUtils responseUtils = new ResponseUtils();
 
 	Utils util = new Utils();
-
-	/**
-	 * Finds and returns all expression in the dictionary
-	 * 
-	 * @param result
-	 * @return
-	 */
-	@GetMapping(value = "/api/expression/findAll")
-	public ResponseEntity<Response<Expression>> findAll() {
-		Response<Expression> response = new Response<>();
-
-		List<Expression> list = new ArrayList<>();
-
-		try {
-			service.findAll().forEach(expressionFromDB -> list.add(util.convertToModel(expressionFromDB)));
-			response.setListData(list);
-			response = responseUtils.setMessages(response, "Resource found", true);
-		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
-		}
-
-		return ResponseEntity.ok(response);
-	}
 
 	/**
 	 * 
@@ -77,9 +55,9 @@ public class ExpressionController {
 		try {
 			expression = util.convertToModel(service.findByExpression(expressionToFind.getExpression()));
 			response.setData(expression);
-			response = responseUtils.setMessages(response, "Resource found", true);
+			response = responseUtils.setMessages(response, "Resource found", "ExpressionController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -97,13 +75,14 @@ public class ExpressionController {
 
 		List<Expression> list = new ArrayList<>();
 		try {
-			dictionaryExpressionService.findByDictionaryId(id)
-					.forEach(expressionFromDB -> list.add(util.convertToModel(expressionFromDB)));
+			dictionaryExpressionService.findByDictionaryId(id).forEach(expressionFromDB -> {
+				list.add(util.convertToModel(expressionFromDB));
+			});
 			Collections.shuffle(list);
 			response.setListData(list);
-			response = responseUtils.setMessages(response, "Resource found", true);
+			response = responseUtils.setMessages(response, "Resource found", "ExpressionController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -125,10 +104,10 @@ public class ExpressionController {
 			expression.setDictionary(dictionary);
 			expression = util.convertToModel(service.addexpression(util.convertToEntity(expression)));
 			response.setData(expression);
-			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been added!",
+			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been added!", "ExpressionController",
 					true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -151,9 +130,9 @@ public class ExpressionController {
 			service.updateExpression(util.convertToEntity(expression));
 			response.setData(expression);
 			response = responseUtils.setMessages(response,
-					"Sucess, " + expression.getExpression() + " has been updated!", true);
+					"Sucess, " + expression.getExpression() + " has been updated!", "ExpressionController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -176,9 +155,9 @@ public class ExpressionController {
 			service.removeExpressionById(expression.getId());
 			response.setData(expression);
 			response = responseUtils.setMessages(response,
-					"Sucess, " + expression.getExpression() + " has been removed!", true);
+					"Sucess, " + expression.getExpression() + " has been removed!", "ExpressionController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -203,10 +182,10 @@ public class ExpressionController {
 			dictionaryExpressionService.updateHitsFails(util.convertToEntity(dictionary),
 					util.convertToEntity(expression));
 			response.setData(expression);
-			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been hit!",
+			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been hit!", "ExpressionController",
 					true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -232,10 +211,10 @@ public class ExpressionController {
 					util.convertToEntity(expression));
 
 			response.setData(expression);
-			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been fail!",
+			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been fail!", "ExpressionController",
 					true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -249,7 +228,11 @@ public class ExpressionController {
 	 */
 	public Dictionary getDictionaryModel(Long dictionaryIdentityKey) {
 		Dictionary dictionary = new Dictionary();
-		dictionary = util.convertToModel(dictionaryExpressionService.findDictionaryById(dictionaryIdentityKey));
+		try {
+			dictionary = util.convertToModel(dictionaryExpressionService.findDictionaryById(dictionaryIdentityKey));
+		} catch (Exception e) {
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+		}
 		return dictionary;
 	}
 
