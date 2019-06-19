@@ -43,7 +43,7 @@ public class UserController {
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been added!",
 					"UserController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -59,7 +59,7 @@ public class UserController {
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been updated!",
 					"UserController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -108,7 +108,7 @@ public class UserController {
 				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -153,7 +153,7 @@ public class UserController {
 				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -175,7 +175,7 @@ public class UserController {
 				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! E-mail not found");
 		}
 
 		return ResponseEntity.ok(response);
@@ -197,7 +197,7 @@ public class UserController {
 				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -219,7 +219,7 @@ public class UserController {
 				response = responseUtils.setMessages(response, "User not found", "UserController", false);
 			}
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);

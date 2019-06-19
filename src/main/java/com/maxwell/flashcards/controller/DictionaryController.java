@@ -107,7 +107,7 @@ public class DictionaryController {
 						"DictionaryController", true);
 			}
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -131,7 +131,7 @@ public class DictionaryController {
 					"Sucess, dictionary " + dictionary.getDictionaryName() + " has been updated!",
 					"DictionaryController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);

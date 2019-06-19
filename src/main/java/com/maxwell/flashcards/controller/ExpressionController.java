@@ -57,7 +57,7 @@ public class ExpressionController {
 			response.setData(expression);
 			response = responseUtils.setMessages(response, "Resource found", "ExpressionController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Expression not found" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -82,7 +82,7 @@ public class ExpressionController {
 			response.setListData(list);
 			response = responseUtils.setMessages(response, "Resource found", "ExpressionController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Expression not found" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -107,7 +107,7 @@ public class ExpressionController {
 			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been added!", "ExpressionController",
 					true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -132,7 +132,7 @@ public class ExpressionController {
 			response = responseUtils.setMessages(response,
 					"Sucess, " + expression.getExpression() + " has been updated!", "ExpressionController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
