@@ -18,6 +18,7 @@ import com.maxwell.flashcards.model.Data;
 import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
+import com.maxwell.flashcards.util.PasswordUtils;
 import com.maxwell.flashcards.exception.ResourceNotFoundException;
 
 @CrossOrigin(origins = "*")
@@ -35,6 +36,8 @@ public class UserController {
 		Data data = new Data();
 		user.setIsLogged(true);
 
+		user = generateSecurePassword(user);
+
 		try {
 			service.save(user);
 			data.setId(user.getId());
@@ -43,7 +46,8 @@ public class UserController {
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been added!",
 					"UserController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
+			throw new ResourceNotFoundException(
+					"Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -53,13 +57,16 @@ public class UserController {
 	public ResponseEntity<Response<UserEntity>> update(@Valid @RequestBody UserEntity user) {
 		Response<UserEntity> response = new Response<UserEntity>();
 
+		user = generateSecurePassword(user);
+
 		try {
 			service.update(user);
 			response.setData(user);
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been updated!",
 					"UserController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
+			throw new ResourceNotFoundException(
+					"Something went wrong! Please, check the typed information" + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -73,7 +80,8 @@ public class UserController {
 
 		try {
 			userFromDB = service.findByUserName(user.getUserName());
-			if (userFromDB != null && userFromDB.getPassword().equals(user.getPassword())) {
+			if (userFromDB != null && PasswordUtils.verifyUserPassword(user.getPassword(), userFromDB.getPassword(),
+					userFromDB.getSalt())) {
 				user = userFromDB;
 				user.setIsLogged(true);
 				update(user);
@@ -82,7 +90,7 @@ public class UserController {
 				response.setData(data);
 				response = responseUtils.setMessages(response, "Logged in", "UserController", true);
 			} else {
-				response = responseUtils.setMessages(response, "Sorry, user login does not match", "UserController",
+				response = responseUtils.setMessages(response, "Sorry, login does not match", "UserController",
 						false);
 			}
 		} catch (Exception e) {
@@ -208,6 +216,8 @@ public class UserController {
 		Response<UserEntity> response = new Response<UserEntity>();
 		UserEntity userFromDB = new UserEntity();
 
+		user = generateSecurePassword(user);
+
 		try {
 			userFromDB = service.findUserById(user.getId()).orElse(null);
 			if (userFromDB != null) {
@@ -223,6 +233,15 @@ public class UserController {
 		}
 
 		return ResponseEntity.ok(response);
+	}
+
+	public UserEntity generateSecurePassword(UserEntity user) {
+		String salt = PasswordUtils.getSalt(30);
+		user.setSalt(salt);
+
+		String securePassword = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
+		user.setPassword(securePassword);
+		return user;
 	}
 
 }

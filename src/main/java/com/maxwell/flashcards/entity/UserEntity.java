@@ -21,6 +21,9 @@ public class UserEntity {
 	@Column(name = "password", nullable = false)
 	private String password;
 
+	@Column(name = "salt", nullable = false)
+	private String salt;
+
 	@Column(name = "email", nullable = false)
 	private String email;
 
@@ -52,6 +55,14 @@ public class UserEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 
 	public String getEmail() {
