@@ -14,18 +14,16 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private UserRepository repository;
-	
-	
 
 	@Override
 	public UserEntity save(UserEntity user) {
 		return repository.save(user);
 	}
-	
+
 	public Optional<UserEntity> findUserById(Long id) {
 		return repository.findById(id);
 	}
-	
+
 	public UserEntity update(UserEntity user) {
 		return repository.save(user);
 	}
@@ -39,7 +37,5 @@ public class UserServiceImpl implements UserService {
 	public UserEntity findUserByEmail(String email) {
 		return repository.findUserByEmail(email);
 	}
-	
-	
 
 }

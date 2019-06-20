@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.UserEntity;
+import com.maxwell.flashcards.exception.ResourceNotFoundException;
 import com.maxwell.flashcards.model.Data;
 import com.maxwell.flashcards.response.Response;
 import com.maxwell.flashcards.response.ResponseUtils;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
 import com.maxwell.flashcards.util.PasswordUtils;
-import com.maxwell.flashcards.exception.ResourceNotFoundException;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -36,9 +36,8 @@ public class UserController {
 		Data data = new Data();
 		user.setIsLogged(true);
 
-		user = generateSecurePassword(user);
-
 		try {
+			user.setPassword(PasswordUtils.base64Encode(user.getPassword()));
 			service.save(user);
 			data.setId(user.getId());
 			data.setStatus(true);
@@ -57,9 +56,8 @@ public class UserController {
 	public ResponseEntity<Response<UserEntity>> update(@Valid @RequestBody UserEntity user) {
 		Response<UserEntity> response = new Response<UserEntity>();
 
-		user = generateSecurePassword(user);
-
 		try {
+			user.setPassword(PasswordUtils.base64Encode(user.getPassword()));
 			service.update(user);
 			response.setData(user);
 			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been updated!",
@@ -80,8 +78,9 @@ public class UserController {
 
 		try {
 			userFromDB = service.findByUserName(user.getUserName());
-			if (userFromDB != null && PasswordUtils.verifyUserPassword(user.getPassword(), userFromDB.getPassword(),
-					userFromDB.getSalt())) {
+			System.out.println(userFromDB.toString());
+			System.out.println(user.toString());
+			if (userFromDB != null && PasswordUtils.base64Decode(userFromDB.getPassword()).equals(user.getPassword())) {
 				user = userFromDB;
 				user.setIsLogged(true);
 				update(user);
@@ -216,11 +215,10 @@ public class UserController {
 		Response<UserEntity> response = new Response<UserEntity>();
 		UserEntity userFromDB = new UserEntity();
 
-		user = generateSecurePassword(user);
-
 		try {
 			userFromDB = service.findUserById(user.getId()).orElse(null);
 			if (userFromDB != null) {
+				user.setPassword(PasswordUtils.base64Encode(user.getPassword()));
 				userFromDB.setPassword(user.getPassword());
 				service.save(userFromDB);
 				response.setData(userFromDB);
@@ -233,15 +231,6 @@ public class UserController {
 		}
 
 		return ResponseEntity.ok(response);
-	}
-
-	public UserEntity generateSecurePassword(UserEntity user) {
-		String salt = PasswordUtils.getSalt(30);
-		user.setSalt(salt);
-
-		String securePassword = PasswordUtils.generateSecurePassword(user.getPassword(), salt);
-		user.setPassword(securePassword);
-		return user;
 	}
 
 }

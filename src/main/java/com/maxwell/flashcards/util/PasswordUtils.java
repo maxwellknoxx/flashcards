@@ -58,5 +58,15 @@ public class PasswordUtils {
 
 		return returnValue;
 	}
+	
+	public static String base64Encode(String password) {
+		return Base64.getEncoder().encodeToString(password.getBytes());
+	}
+	
+	public static String base64Decode(String password) {
+		byte[] decodedBytes = Base64.getDecoder().decode(password);
+		String decodedString = new String(decodedBytes);
+		return decodedString;
+	}
 
 }
