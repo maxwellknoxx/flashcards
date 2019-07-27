@@ -1,59 +1,61 @@
 package com.maxwell.flashcards.util;
 
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
 import com.maxwell.flashcards.entity.DictionaryEntity;
 import com.maxwell.flashcards.entity.ExpressionEntity;
+import com.maxwell.flashcards.entity.UserEntity;
 import com.maxwell.flashcards.model.Dictionary;
 import com.maxwell.flashcards.model.Expression;
+import com.maxwell.flashcards.model.User;
 
 public class Utils {
 
-	public Dictionary convertToModel(DictionaryEntity dictionaryEntity)  {
-		Dictionary dictionaryModel = new Dictionary();
-
-		dictionaryModel.setDictionaryName(dictionaryEntity.getDictionaryName());
-		dictionaryModel.setHitWords(dictionaryEntity.getHitWords());
-		dictionaryModel.setId(dictionaryEntity.getId());
-		dictionaryModel.setFailWords(dictionaryEntity.getfailWords());
-
-		return dictionaryModel;
+	public static Dictionary convertDictionaryToModel(DictionaryEntity entity) {
+		return Dictionary.builder().id(entity.getId()).dictionaryName(entity.getDictionaryName())
+				.idUser(entity.getUser().getId()).username(entity.getUser().getUserName())
+				.failWords(entity.getFailWords()).hitWords(entity.getHitWords())
+				.expressions(convertExpressionToModelList(entity.getExpressions())).build();
 	}
 
-	public DictionaryEntity convertToEntity(Dictionary dictionary)  {
-		DictionaryEntity dictionaryEntity = new DictionaryEntity();
-
-		dictionaryEntity.setDictionaryName(dictionary.getDictionaryName());
-		dictionaryEntity.setHitWords(dictionary.getHitWords());
-		dictionaryEntity.setId(dictionary.getId());
-		dictionaryEntity.setfailWords(dictionary.getFailWords());
-
-		return dictionaryEntity;
+	public static List<Dictionary> convertDictionaryToModelList(List<DictionaryEntity> entities) {
+		return entities.stream().filter(Objects::nonNull)
+				.map(entity -> Dictionary.builder().id(entity.getId()).dictionaryName(entity.getDictionaryName())
+						.idUser(entity.getUser().getId()).username(entity.getUser().getUserName())
+						.failWords(entity.getFailWords()).hitWords(entity.getHitWords())
+						.expressions(convertExpressionToModelList(entity.getExpressions())).build())
+				.collect(Collectors.toList());
 	}
 
-	public Expression convertToModel(ExpressionEntity expressionEntity)  {
-		Expression expression = new Expression();
-
-		expression.setExpression(expressionEntity.getExpression());
-		expression.setFails(expressionEntity.getFails());
-		expression.setHits(expressionEntity.getHits());
-		expression.setId(expressionEntity.getId());
-		expression.setMeaning(expressionEntity.getMeaning());
-		expression.setDictionaryIdentityKey(expressionEntity.getDictionary().getId().toString());
-		expression.setDictionary(convertToModel(expressionEntity.getDictionary()));
-
-		return expression;
+	public static Expression convertExpressionToModel(ExpressionEntity entity) {
+		return Expression.builder().id(entity.getId()).expression(entity.getExpression()).meaning(entity.getMeaning())
+				.hits(entity.getHits()).fails(entity.getFails()).dictionary(entity.getDictionary().getDictionaryName())
+				.dictionaryId(entity.getDictionary().getId()).build();
 	}
 
-	public ExpressionEntity convertToEntity(Expression expression)  {
-		ExpressionEntity expressionEntity = new ExpressionEntity();
+	public static List<Expression> convertExpressionToModelList(List<ExpressionEntity> entities) {
+		return entities.stream().filter(Objects::nonNull)
+				.map(entity -> Expression.builder().id(entity.getId()).expression(entity.getExpression())
+						.meaning(entity.getMeaning()).hits(entity.getHits()).fails(entity.getFails())
+						.dictionary(entity.getDictionary().getDictionaryName())
+						.dictionaryId(entity.getDictionary().getId()).build())
+				.collect(Collectors.toList());
+	}
 
-		expressionEntity.setExpression(expression.getExpression());
-		expressionEntity.setFails(expression.getFails());
-		expressionEntity.setHits(expression.getHits());
-		expressionEntity.setId(expression.getId());
-		expressionEntity.setMeaning(expression.getMeaning());
-		expressionEntity.setDictionary(convertToEntity(expression.getDictionary()));
+	public static User convertUserEntityToModel(UserEntity entity) {
+		return User.builder().id(entity.getId()).username(entity.getUserName()).email(entity.getEmail())
+				.isLogged(entity.getIsLogged()).dictionaries(convertDictionaryToModelList(entity.getDictionaries()))
+				.build();
+	}
 
-		return expressionEntity;
+	public static List<User> convertUserEntityToModelList(List<UserEntity> entities) {
+		return entities.stream().filter(Objects::nonNull)
+				.map(entity -> User.builder().id(entity.getId()).username(entity.getUserName()).email(entity.getEmail())
+						.isLogged(entity.getIsLogged())
+						.dictionaries(convertDictionaryToModelList(entity.getDictionaries())).build())
+				.collect(Collectors.toList());
 	}
 
 }

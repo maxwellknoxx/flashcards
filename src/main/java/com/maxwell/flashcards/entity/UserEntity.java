@@ -1,21 +1,37 @@
 package com.maxwell.flashcards.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.NaturalId;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
 @Entity
-@Table(name = "user")
+@Table(name = "users", uniqueConstraints = { @UniqueConstraint(columnNames = { "username" }) })
 public class UserEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "user_name", nullable = false)
+	@NaturalId
+	@Column(name = "username", nullable = false)
 	private String userName;
 
 	@Column(name = "password", nullable = false)
@@ -30,57 +46,7 @@ public class UserEntity {
 	@Column(name = "is_logged", nullable = true)
 	private Boolean isLogged;
 
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	public String getUserName() {
-		return userName;
-	}
-
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getAnswer() {
-		return answer;
-	}
-
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
-
-	public Boolean getIsLogged() {
-		return isLogged;
-	}
-
-	public void setIsLogged(Boolean isLogged) {
-		this.isLogged = isLogged;
-	}
-
-	@Override
-	public String toString() {
-		return "UserEntity [id=" + id + ", userName=" + userName + ", password=" + password + ", email=" + email + ", answer=" + answer + ", isLogged=" + isLogged + "]";
-	}
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+	private List<DictionaryEntity> dictionaries = new ArrayList<>();
 
 }

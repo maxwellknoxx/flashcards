@@ -1,5 +1,7 @@
 package com.maxwell.flashcards.model;
 
+import java.util.List;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,14 +11,12 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class Expression {
+public class User {
 
 	private Long id;
-	private String expression;
-	private String meaning;
-	private String dictionary;
-	private Long dictionaryId;
-	private int hits;
-	private int fails;
-
+	private String username;
+	private String email;
+	private Boolean isLogged;
+	List<Dictionary> dictionaries;
+	
 }

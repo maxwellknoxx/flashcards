@@ -9,5 +9,7 @@ public interface ExpressionService {
 	List<ExpressionEntity> findAll();
 
 	ExpressionEntity findByExpression(String expression);
+	
+	List<ExpressionEntity> findByDictionaryId(Long dictionariId);
 
 }

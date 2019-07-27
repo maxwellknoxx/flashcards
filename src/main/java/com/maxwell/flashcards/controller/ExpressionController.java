@@ -7,8 +7,11 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,14 +19,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.maxwell.flashcards.model.Dictionary;
+import com.maxwell.flashcards.entity.ExpressionEntity;
 import com.maxwell.flashcards.model.Expression;
-import com.maxwell.flashcards.response.Response;
-import com.maxwell.flashcards.response.ResponseUtils;
-import com.maxwell.flashcards.service.impl.DictionaryExpressionServiceImpl;
 import com.maxwell.flashcards.service.impl.ExpressionServiceImpl;
+import com.maxwell.flashcards.service.impl.MapValidationErrorService;
 import com.maxwell.flashcards.util.Utils;
-import com.maxwell.flashcards.exception.ResourceNotFoundException;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -31,13 +31,9 @@ public class ExpressionController {
 
 	@Autowired
 	private ExpressionServiceImpl service;
-
+	
 	@Autowired
-	private DictionaryExpressionServiceImpl dictionaryExpressionService;
-
-	ResponseUtils responseUtils = new ResponseUtils();
-
-	Utils util = new Utils();
+	private MapValidationErrorService mapValidationErrorService;
 
 	/**
 	 * 
@@ -48,19 +44,12 @@ public class ExpressionController {
 	 * @return
 	 */
 	@GetMapping(value = "/api/expression/findByExpression")
-	public ResponseEntity<Response<Expression>> findByExpression(@Valid @RequestBody Expression expressionToFind) {
-		Response<Expression> response = new Response<>();
+	public ResponseEntity<?> findByExpression(@Valid @RequestBody Expression expressionToFind) {
 
-		Expression expression = null;
-		try {
-			expression = util.convertToModel(service.findByExpression(expressionToFind.getExpression()));
-			response.setData(expression);
-			response = responseUtils.setMessages(response, "Resource found", "ExpressionController", true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! Expression not found" + e.getMessage());
-		}
+		Expression expression = Utils
+				.convertExpressionToModel(service.findByExpression(expressionToFind.getExpression()));
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<Expression>(expression, HttpStatus.OK);
 	}
 
 	/**
@@ -70,22 +59,15 @@ public class ExpressionController {
 	 * @return
 	 */
 	@GetMapping(value = "/api/expression/findExpressionsByDictionaryId/{id}")
-	public ResponseEntity<Response<Expression>> findExpressionsByDictionaryId(@PathVariable(value = "id") long id) {
-		Response<Expression> response = new Response<>();
+	public ResponseEntity<?> findExpressionsByDictionaryId(@PathVariable(value = "id") long id) {
 
 		List<Expression> list = new ArrayList<>();
-		try {
-			dictionaryExpressionService.findByDictionaryId(id).forEach(expressionFromDB -> {
-				list.add(util.convertToModel(expressionFromDB));
-			});
-			Collections.shuffle(list);
-			response.setListData(list);
-			response = responseUtils.setMessages(response, "Resource found", "ExpressionController", true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! Expression not found" + e.getMessage());
-		}
+		service.findByDictionaryId(id).forEach(expressionFromDB -> {
+			list.add(Utils.convertExpressionToModel(expressionFromDB));
+		});
+		Collections.shuffle(list);
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<List<Expression>>(list, HttpStatus.OK);
 	}
 
 	/**
@@ -95,22 +77,17 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/expression/addExpression")
-	public ResponseEntity<Response<Expression>> addExpression(@Valid @RequestBody Expression expression) {
-		Response<Expression> response = new Response<>();
-
-		try {
-			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
-			expression.setDictionary(dictionary);
-			expression = util.convertToModel(service.addexpression(util.convertToEntity(expression)));
-			response.setData(expression);
-			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been added!", "ExpressionController",
-					true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
+	@PostMapping(value = "/api/expression/expressions")
+	public ResponseEntity<?> addExpression(@Valid @RequestBody ExpressionEntity entity, BindingResult result) {
+		
+		ResponseEntity<?> errorMap = mapValidationErrorService.mapValidation(result);
+		if (errorMap != null) {
+			return errorMap;
 		}
+		
+		Expression expression = Utils.convertExpressionToModel(service.addExpression((entity)));
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<Expression>(expression, HttpStatus.CREATED);
 	}
 
 	/**
@@ -120,22 +97,12 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PutMapping(value = "/api/expression/update")
-	public ResponseEntity<Response<Expression>> updateExpression(@Valid @RequestBody Expression expression) {
-		Response<Expression> response = new Response<>();
+	@PutMapping(value = "/api/expression/expressions")
+	public ResponseEntity<?> updateExpression(@Valid @RequestBody ExpressionEntity entity) {
 
-		try {
-			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
-			expression.setDictionary(dictionary);
-			service.updateExpression(util.convertToEntity(expression));
-			response.setData(expression);
-			response = responseUtils.setMessages(response,
-					"Sucess, " + expression.getExpression() + " has been updated!", "ExpressionController", true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! Please, check the typed information" + e.getMessage());
-		}
+		ExpressionEntity expression = service.updateExpression(entity);
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<ExpressionEntity>(expression, HttpStatus.CREATED);
 	}
 
 	/**
@@ -145,22 +112,12 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/expression/remove")
-	public ResponseEntity<Response<Expression>> removeExpression(@Valid @RequestBody Expression expression) {
-		Response<Expression> response = new Response<>();
+	@DeleteMapping(value = "/api/expression/expressions")
+	public ResponseEntity<?> removeExpression(@Valid @RequestBody Expression entity) {
 
-		try {
-			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
-			expression.setDictionary(dictionary);
-			service.removeExpressionById(expression.getId());
-			response.setData(expression);
-			response = responseUtils.setMessages(response,
-					"Sucess, " + expression.getExpression() + " has been removed!", "ExpressionController", true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
-		}
+		service.removeExpressionById(entity.getId());
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<String>("The expression has been removed!", HttpStatus.OK);
 	}
 
 	/**
@@ -171,24 +128,15 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/expression/hit")
-	public ResponseEntity<Response<Expression>> markAsHit(@Valid @RequestBody Expression expression) {
-		Response<Expression> response = new Response<>();
+	public ResponseEntity<?> markAsHit(@Valid @RequestBody ExpressionEntity entity) {
 
-		try {
-			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
-			dictionary.addHitWords();
-			expression.addHit();
-			expression.setDictionary(dictionary);
-			dictionaryExpressionService.updateHitsFails(util.convertToEntity(dictionary),
-					util.convertToEntity(expression));
-			response.setData(expression);
-			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been hit!", "ExpressionController",
-					true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
-		}
+		entity.addHit();
+		entity.getDictionary().addHit();
 
-		return ResponseEntity.ok(response);
+		service.updateExpression(entity);
+
+		return new ResponseEntity<String>("Expression " + entity.getExpression() + " has been marked as a hit",
+				HttpStatus.OK);
 	}
 
 	/**
@@ -199,41 +147,15 @@ public class ExpressionController {
 	 * @return
 	 */
 	@PostMapping(value = "/api/expression/fail")
-	public ResponseEntity<Response<Expression>> markAsFail(@Valid @RequestBody Expression expression) {
-		Response<Expression> response = new Response<>();
+	public ResponseEntity<?> markAsFail(@Valid @RequestBody ExpressionEntity entity) {
 
-		try {
-			Dictionary dictionary = getDictionaryModel(Long.parseLong(expression.getDictionaryIdentityKey()));
-			dictionary.addFailWords();
-			expression.addFail();
-			expression.setDictionary(dictionary);
-			dictionaryExpressionService.updateHitsFails(util.convertToEntity(dictionary),
-					util.convertToEntity(expression));
+		entity.addFail();
+		entity.getDictionary().addFail();
 
-			response.setData(expression);
-			response = responseUtils.setMessages(response, "Sucess, " + expression.getExpression() + " has been fail!", "ExpressionController",
-					true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
-		}
+		service.updateExpression(entity);
 
-		return ResponseEntity.ok(response);
-	}
-
-	/**
-	 * Gets the dictionary converted to Model
-	 * 
-	 * @param dictionaryIdentityKey
-	 * @return
-	 */
-	public Dictionary getDictionaryModel(Long dictionaryIdentityKey) {
-		Dictionary dictionary = new Dictionary();
-		try {
-			dictionary = util.convertToModel(dictionaryExpressionService.findDictionaryById(dictionaryIdentityKey));
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
-		}
-		return dictionary;
+		return new ResponseEntity<String>("Expression " + entity.getExpression() + " has been marked as a fail",
+				HttpStatus.OK);
 	}
 
 }

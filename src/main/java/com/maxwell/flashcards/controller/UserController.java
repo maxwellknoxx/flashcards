@@ -5,21 +5,23 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.UserEntity;
 import com.maxwell.flashcards.exception.ResourceNotFoundException;
-import com.maxwell.flashcards.model.Data;
-import com.maxwell.flashcards.response.Response;
-import com.maxwell.flashcards.response.ResponseUtils;
+import com.maxwell.flashcards.model.User;
+import com.maxwell.flashcards.service.impl.MapValidationErrorService;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
 import com.maxwell.flashcards.util.PasswordUtils;
+import com.maxwell.flashcards.util.Utils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -28,209 +30,154 @@ public class UserController {
 	@Autowired
 	private UserServiceImpl service;
 
-	ResponseUtils responseUtils = new ResponseUtils();
+	@Autowired
+	private MapValidationErrorService mapValidationErrorService;
 
-	@PostMapping(value = "/api/user/save")
-	public ResponseEntity<Response<Data>> addUser(@Valid @RequestBody UserEntity user) {
-		Response<Data> response = new Response<Data>();
-		Data data = new Data();
-		user.setIsLogged(true);
-
-		try {
-			user.setPassword(PasswordUtils.base64Encode(user.getPassword()));
-			service.save(user);
-			data.setId(user.getId());
-			data.setStatus(true);
-			response.setData(data);
-			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been added!",
-					"UserController", true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException(
-					"Something went wrong! Please, check the typed information" + e.getMessage());
+	/**
+	 * 
+	 * @param entity
+	 * @return
+	 */
+	@PostMapping(value = "/api/user/users")
+	public ResponseEntity<?> addUser(@Valid @RequestBody UserEntity entity, BindingResult result) {
+		ResponseEntity<?> errorMap = mapValidationErrorService.mapValidation(result);
+		if (errorMap != null) {
+			return errorMap;
 		}
 
-		return ResponseEntity.ok(response);
+		entity.setIsLogged(true);
+
+		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
+		User user = Utils.convertUserEntityToModel((service.save(entity)));
+
+		return new ResponseEntity<User>(user, HttpStatus.CREATED);
 	}
 
-	@PostMapping(value = "/api/user/update")
-	public ResponseEntity<Response<UserEntity>> update(@Valid @RequestBody UserEntity user) {
-		Response<UserEntity> response = new Response<UserEntity>();
+	/**
+	 * 
+	 * @param entity
+	 * @return
+	 */
+	@PutMapping(value = "/api/user/users")
+	public ResponseEntity<?> update(@Valid @RequestBody UserEntity entity) {
 
-		try {
-			user.setPassword(PasswordUtils.base64Encode(user.getPassword()));
-			service.update(user);
-			response.setData(user);
-			response = responseUtils.setMessages(response, "Success " + user.getUserName() + " has been updated!",
-					"UserController", true);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException(
-					"Something went wrong! Please, check the typed information" + e.getMessage());
-		}
+		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
+		User user = Utils.convertUserEntityToModel(service.update(entity));
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<User>(user, HttpStatus.CREATED);
 	}
 
+	/**
+	 * 
+	 * @param entity
+	 * @return
+	 */
 	@PostMapping(value = "/api/user/login")
-	public ResponseEntity<Response<Data>> login(@Valid @RequestBody UserEntity user) {
-		Response<Data> response = new Response<Data>();
+	public ResponseEntity<?> login(@Valid @RequestBody UserEntity entity) {
 		UserEntity userFromDB = new UserEntity();
-		Data data = new Data();
+		User user;
 
-		try {
-			userFromDB = service.findByUserName(user.getUserName());
-			System.out.println(userFromDB.toString());
-			System.out.println(user.toString());
-			if (userFromDB != null && PasswordUtils.base64Decode(userFromDB.getPassword()).equals(user.getPassword())) {
-				user = userFromDB;
-				user.setIsLogged(true);
-				update(user);
-				data.setId(userFromDB.getId());
-				data.setStatus(true);
-				response.setData(data);
-				response = responseUtils.setMessages(response, "Logged in", "UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "Sorry, login does not match", "UserController",
-						false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+		userFromDB = service.findByUserName(entity.getUserName());
+		if (userFromDB != null && PasswordUtils.base64Decode(userFromDB.getPassword()).equals(entity.getPassword())) {
+			entity = userFromDB;
+			entity.setIsLogged(true);
+			user = Utils.convertUserEntityToModel(service.update(entity));
+		} else {
+			throw new ResourceNotFoundException("Please, verify login information");
 		}
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@GetMapping(value = "/api/user/logout/{id}")
-	public ResponseEntity<Response<UserEntity>> logout(@PathVariable(name = "id") Long id) {
-		Response<UserEntity> response = new Response<UserEntity>();
+	public ResponseEntity<?> logout(@PathVariable(name = "id") Long id) {
 		UserEntity user = new UserEntity();
 
-		try {
-			user = service.findUserById(id).orElse(null);
-			if (user != null) {
-				user.setIsLogged(false);
-				user = service.update(user);
-				response.setData(user);
-				response = responseUtils.setMessages(response, "User logged out", "UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "User not found", "UserController", false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
+		user = service.findUserById(id);
+		if (user != null) {
+			user.setIsLogged(false);
+			user = service.update(user);
+		} else {
+			throw new ResourceNotFoundException("User not found");
 		}
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<String>("User logged out successfully", HttpStatus.OK);
 	}
 
+	
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@GetMapping(value = "/api/user/isLogged/{id}")
-	public ResponseEntity<Response<Data>> isLogged(@PathVariable(name = "id") Long id) {
-		Response<Data> response = new Response<Data>();
+	public ResponseEntity<?> isLogged(@PathVariable(name = "id") Long id) {
 		UserEntity userFromDB = new UserEntity();
-		Data data = new Data();
+		User user;
 
-		try {
-			userFromDB = service.findUserById(id).orElse(null);
-			if (userFromDB != null && userFromDB.getIsLogged().equals(true)) {
-				data.setId(userFromDB.getId());
-				data.setStatus(true);
-				response.setData(data);
-				response = responseUtils.setMessages(response, "User is logged", "UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "User is not logged", "UserController", false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+		userFromDB = service.findUserById(id);
+		if (userFromDB != null && userFromDB.getIsLogged().equals(true)) {
+			user = Utils.convertUserEntityToModel(userFromDB);
+		} else {
+			throw new ResourceNotFoundException("User not found");
 		}
 
-		return ResponseEntity.ok(response);
+		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
+	/**
+	 * 
+	 * @param id
+	 * @return
+	 */
 	@GetMapping(value = "/api/user/getUserById/{id}")
-	public ResponseEntity<Response<UserEntity>> getUserById(@PathVariable("id") Long id) {
-		Response<UserEntity> response = new Response<UserEntity>();
+	public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
 		UserEntity userFromDB = new UserEntity();
 
-		try {
-			userFromDB = service.findUserById(id).orElse(null);
-			if (userFromDB != null) {
-				response.setData(userFromDB);
-				response = responseUtils.setMessages(response, "User " + userFromDB.getUserName() + " has been found",
-						"UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "User not found", "UserController", false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
+		userFromDB = service.findUserById(id);
+		if (userFromDB != null) {
+			return new ResponseEntity<UserEntity>(userFromDB, HttpStatus.OK);
+		} else {
+			throw new ResourceNotFoundException("User not found");
 		}
-
-		return ResponseEntity.ok(response);
 	}
 
+	/**
+	 * 
+	 * @param entity
+	 * @return
+	 */
 	@PostMapping(value = "/api/user/getUserByEmail")
-	public ResponseEntity<Response<UserEntity>> getUserByEmail(@Valid @RequestBody UserEntity user) {
-		Response<UserEntity> response = new Response<UserEntity>();
-		UserEntity userFromDB = new UserEntity();
+	public ResponseEntity<?> getUserByEmail(@Valid @RequestBody UserEntity entity) {
 
-		try {
-			userFromDB = service.findUserByEmail(user.getEmail());
-			if (!userFromDB.getUserName().isEmpty()) {
-				response.setData(userFromDB);
-				response.setMessage("User " + userFromDB.getUserName() + " has been found");
-				response = responseUtils.setMessages(response, "User " + userFromDB.getUserName() + " has been found",
-						"UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "User not found", "UserController", false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! E-mail not found");
+		User userFromDB = Utils.convertUserEntityToModel(service.findUserByEmail(entity.getEmail()));
+		if (!userFromDB.getUsername().isEmpty()) {
+			return new ResponseEntity<User>(userFromDB, HttpStatus.OK);
+		} else {
+			throw new ResourceNotFoundException("User not found");
 		}
-
-		return ResponseEntity.ok(response);
 	}
 
+	/**
+	 * 
+	 * @param entity
+	 * @return
+	 */
 	@PostMapping(value = "/api/user/getUser")
-	public ResponseEntity<Response<UserEntity>> getUser(@Valid @RequestBody UserEntity user) {
-		Response<UserEntity> response = new Response<UserEntity>();
-		UserEntity userFromDB = new UserEntity();
+	public ResponseEntity<?> getUser(@Valid @RequestBody UserEntity entity) {
 
-		try {
-			userFromDB = service.findByUserName(user.getUserName());
-			if (!userFromDB.getUserName().isEmpty()) {
-				userFromDB.setPassword("");
-				response.setData(userFromDB);
-				response = responseUtils.setMessages(response, "User " + userFromDB.getUserName() + " has been found",
-						"UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "User not found", "UserController", false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
+		User userFromDB = Utils.convertUserEntityToModel(service.findByUserName(entity.getUserName()));
+		if (!userFromDB.getUsername().isEmpty()) {
+			return new ResponseEntity<User>(userFromDB, HttpStatus.OK);
+		} else {
+			throw new ResourceNotFoundException("User not found");
 		}
-
-		return ResponseEntity.ok(response);
-	}
-
-	@PostMapping(value = "/api/user/updatePassword")
-	public ResponseEntity<Response<UserEntity>> updatePassword(@Valid @RequestBody UserEntity user) {
-		Response<UserEntity> response = new Response<UserEntity>();
-		UserEntity userFromDB = new UserEntity();
-
-		try {
-			userFromDB = service.findUserById(user.getId()).orElse(null);
-			if (userFromDB != null) {
-				user.setPassword(PasswordUtils.base64Encode(user.getPassword()));
-				userFromDB.setPassword(user.getPassword());
-				service.save(userFromDB);
-				response.setData(userFromDB);
-				response = responseUtils.setMessages(response, "Password has been changed", "UserController", true);
-			} else {
-				response = responseUtils.setMessages(response, "User not found", "UserController", false);
-			}
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! User not found" + e.getMessage());
-		}
-
-		return ResponseEntity.ok(response);
 	}
 
 }

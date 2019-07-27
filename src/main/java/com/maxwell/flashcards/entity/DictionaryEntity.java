@@ -1,18 +1,34 @@
 package com.maxwell.flashcards.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+@Getter
+@Setter
+@ToString
 @Entity
-@Table(name = "dictionary")
+@Table(name = "dictionaries")
 public class DictionaryEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@Column(name = "dictionary_name", nullable = false)
@@ -23,37 +39,21 @@ public class DictionaryEntity {
 
 	@Column(name = "hit_words")
 	private int hitWords;
-	
-	public Long getId() {
-		return id;
+
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	@JsonIgnore
+	private UserEntity user;
+
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "dictionary")
+	private List<ExpressionEntity> expressions = new ArrayList<>();
+
+	public void addHit() {
+		this.hitWords = this.hitWords + 1;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void addFail() {
+		this.failWords = this.failWords + 1;
 	}
 
-	public String getDictionaryName() {
-		return dictionaryName;
-	}
-
-	public void setDictionaryName(String dictionaryName) {
-		this.dictionaryName = dictionaryName;
-	}
-
-	public int getfailWords() {
-		return failWords;
-	}
-
-	public void setfailWords(int failWords) {
-		this.failWords = failWords;
-	}
-
-	public int getHitWords() {
-		return hitWords;
-	}
-
-	public void setHitWords(int hitWords) {
-		this.hitWords = hitWords;
-	}
-	
 }
