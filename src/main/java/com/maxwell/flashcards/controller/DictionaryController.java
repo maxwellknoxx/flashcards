@@ -48,6 +48,17 @@ public class DictionaryController {
 	}
 
 	/**
+	 * @param id
+	 * @return
+	 */
+	@GetMapping(value = "/api/v1/dictionary/dictionariesByUserId/{id}")
+	public ResponseEntity<?> findDictionaryByUserId(@PathVariable(value = "id") Long id) {
+		Dictionary dictionary = Utils.convertDictionaryToModel(service.findDictionaryByUserId(id));
+
+		return new ResponseEntity<Dictionary>(dictionary, HttpStatus.OK);
+	}
+
+	/**
 	 * Returns the dictionary with the typed name
 	 * 
 	 * @param dictionaryName
