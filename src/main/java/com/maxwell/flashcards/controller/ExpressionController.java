@@ -43,7 +43,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@GetMapping(value = "/api/expression/findByExpression")
+	@GetMapping(value = "/api/v1/expression/findByExpression")
 	public ResponseEntity<?> findByExpression(@Valid @RequestBody Expression expressionToFind) {
 
 		Expression expression = Utils
@@ -58,7 +58,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@GetMapping(value = "/api/expression/findExpressionsByDictionaryId/{id}")
+	@GetMapping(value = "/api/v1/expression/findExpressionsByDictionaryId/{id}")
 	public ResponseEntity<?> findExpressionsByDictionaryId(@PathVariable(value = "id") long id) {
 
 		List<Expression> list = new ArrayList<>();
@@ -77,7 +77,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/expression/expressions")
+	@PostMapping(value = "/api/v1/expression/expressions")
 	public ResponseEntity<?> addExpression(@Valid @RequestBody ExpressionEntity entity, BindingResult result) {
 		
 		ResponseEntity<?> errorMap = mapValidationErrorService.mapValidation(result);
@@ -97,7 +97,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PutMapping(value = "/api/expression/expressions")
+	@PutMapping(value = "/api/v1/expression/expressions")
 	public ResponseEntity<?> updateExpression(@Valid @RequestBody ExpressionEntity entity) {
 
 		ExpressionEntity expression = service.updateExpression(entity);
@@ -112,7 +112,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@DeleteMapping(value = "/api/expression/expressions")
+	@DeleteMapping(value = "/api/v1/expression/expressions")
 	public ResponseEntity<?> removeExpression(@Valid @RequestBody Expression entity) {
 
 		service.removeExpressionById(entity.getId());
@@ -127,7 +127,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/expression/hit")
+	@PostMapping(value = "/api/v1/expression/hit")
 	public ResponseEntity<?> markAsHit(@Valid @RequestBody ExpressionEntity entity) {
 
 		entity.addHit();
@@ -146,7 +146,7 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/expression/fail")
+	@PostMapping(value = "/api/v1/expression/fail")
 	public ResponseEntity<?> markAsFail(@Valid @RequestBody ExpressionEntity entity) {
 
 		entity.addFail();

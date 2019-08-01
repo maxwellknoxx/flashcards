@@ -40,7 +40,7 @@ public class DictionaryController {
 	 * @param id
 	 * @return
 	 */
-	@GetMapping(value = "/api/dictionary/dictionaries/{id}")
+	@GetMapping(value = "/api/v1/dictionary/dictionaries/{id}")
 	public ResponseEntity<?> findDictionaryById(@PathVariable(value = "id") Long id) {
 		Dictionary dictionary = Utils.convertDictionaryToModel(service.findDictionaryById(id));
 
@@ -54,7 +54,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@GetMapping(value = "/api/dictionary/findByDictionaryName")
+	@GetMapping(value = "/api/v1/dictionary/findByDictionaryName")
 	public ResponseEntity<?> findByDictionaryName(@Valid @RequestParam DictionaryEntity DictionaryToFind) {
 		DictionaryEntity dictionary = new DictionaryEntity();
 
@@ -70,7 +70,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@PostMapping(value = "/api/dictionary/dictionaries")
+	@PostMapping(value = "/api/v1/dictionary/dictionaries")
 	public ResponseEntity<?> addDictionary(@Valid @RequestBody DictionaryEntity request, BindingResult result) {
 
 		DictionaryEntity entity = new DictionaryEntity();
@@ -92,7 +92,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@PutMapping(value = "/api/dictionary/dictionaries")
+	@PutMapping(value = "/api/v1/dictionary/dictionaries")
 	public ResponseEntity<?> updateDictionary(@Valid @RequestBody DictionaryEntity dictionary) {
 
 		DictionaryEntity updatedDictionary = service.updateDictionary(dictionary);
@@ -107,7 +107,7 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@DeleteMapping(value = "/api/dictionary/dictionaries")
+	@DeleteMapping(value = "/api/v1/dictionary/dictionaries")
 	public ResponseEntity<?> removeDictionary(@Valid @RequestBody Dictionary dictionary) {
 		Long id = dictionary.getId();
 
@@ -122,7 +122,7 @@ public class DictionaryController {
 	 * @param dictionaryName
 	 * @return
 	 */
-	@GetMapping(value = "/api/dictionary/totals")
+	@GetMapping(value = "/api/v1/dictionary/totals")
 	public ResponseEntity<?> totalHitFail(String dictionaryName) {
 		int totalHitWords = 0;
 		int totalFailWords = 0;

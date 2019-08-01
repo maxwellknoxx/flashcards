@@ -38,7 +38,7 @@ public class UserController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(value = "/api/user/users")
+	@PostMapping(value = "/api/v1/user/users")
 	public ResponseEntity<?> addUser(@Valid @RequestBody UserEntity entity, BindingResult result) {
 		ResponseEntity<?> errorMap = mapValidationErrorService.mapValidation(result);
 		if (errorMap != null) {
@@ -58,7 +58,7 @@ public class UserController {
 	 * @param entity
 	 * @return
 	 */
-	@PutMapping(value = "/api/user/users")
+	@PutMapping(value = "/api/v1/user/users")
 	public ResponseEntity<?> update(@Valid @RequestBody UserEntity entity) {
 
 		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
@@ -72,7 +72,7 @@ public class UserController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(value = "/api/user/login")
+	@PostMapping(value = "/api/v1/user/login")
 	public ResponseEntity<?> login(@Valid @RequestBody UserEntity entity) {
 		UserEntity userFromDB = new UserEntity();
 		User user;
@@ -94,7 +94,7 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@GetMapping(value = "/api/user/logout/{id}")
+	@GetMapping(value = "/api/v1/user/logout/{id}")
 	public ResponseEntity<?> logout(@PathVariable(name = "id") Long id) {
 		UserEntity user = new UserEntity();
 
@@ -116,7 +116,7 @@ public class UserController {
 	 * @return
 	 */
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@GetMapping(value = "/api/user/isLogged/{id}")
+	@GetMapping(value = "/api/v1/user/isLogged/{id}")
 	public ResponseEntity<?> isLogged(@PathVariable(name = "id") Long id) {
 		UserEntity userFromDB = new UserEntity();
 		User user;
@@ -136,7 +136,7 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@GetMapping(value = "/api/user/getUserById/{id}")
+	@GetMapping(value = "/api/v1/user/getUserById/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
 		UserEntity userFromDB = new UserEntity();
 
@@ -153,7 +153,7 @@ public class UserController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(value = "/api/user/getUserByEmail")
+	@PostMapping(value = "/api/v1/user/getUserByEmail")
 	public ResponseEntity<?> getUserByEmail(@Valid @RequestBody UserEntity entity) {
 
 		User userFromDB = Utils.convertUserEntityToModel(service.findUserByEmail(entity.getEmail()));
@@ -169,7 +169,7 @@ public class UserController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(value = "/api/user/getUser")
+	@PostMapping(value = "/api/v1/user/getUser")
 	public ResponseEntity<?> getUser(@Valid @RequestBody UserEntity entity) {
 
 		User userFromDB = Utils.convertUserEntityToModel(service.findByUserName(entity.getUserName()));
