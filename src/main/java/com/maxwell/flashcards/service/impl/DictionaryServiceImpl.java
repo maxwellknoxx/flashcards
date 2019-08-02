@@ -69,8 +69,8 @@ public class DictionaryServiceImpl implements DictionaryService {
 	}
 
 	@Override
-	public DictionaryEntity findDictionaryByUserId(Long id) {
-		DictionaryEntity dictionary = repository.findDictionaryByUserId(id);
+	public List<DictionaryEntity> findDictionaryByUserId(Long id) {
+		List<DictionaryEntity> dictionary = repository.findDictionaryByUserId(id);
 		if (Objects.isNull(dictionary)) {
 			throw new ResourceNotFoundException("User " + id + " does not exist");
 		}

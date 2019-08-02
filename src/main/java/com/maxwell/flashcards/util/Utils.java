@@ -17,7 +17,7 @@ public class Utils {
 		return Dictionary.builder().id(entity.getId()).dictionaryName(entity.getDictionaryName())
 				.idUser(entity.getUser().getId()).username(entity.getUser().getUserName())
 				.failWords(entity.getFailWords()).hitWords(entity.getHitWords())
-				.expressions(convertExpressionToModelList(entity.getExpressions())).build();
+				.build();
 	}
 
 	public static List<Dictionary> convertDictionaryToModelList(List<DictionaryEntity> entities) {
@@ -25,7 +25,7 @@ public class Utils {
 				.map(entity -> Dictionary.builder().id(entity.getId()).dictionaryName(entity.getDictionaryName())
 						.idUser(entity.getUser().getId()).username(entity.getUser().getUserName())
 						.failWords(entity.getFailWords()).hitWords(entity.getHitWords())
-						.expressions(convertExpressionToModelList(entity.getExpressions())).build())
+						.build())
 				.collect(Collectors.toList());
 	}
 

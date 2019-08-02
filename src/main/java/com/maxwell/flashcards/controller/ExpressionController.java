@@ -31,9 +31,11 @@ public class ExpressionController {
 
 	@Autowired
 	private ExpressionServiceImpl service;
-	
+
 	@Autowired
 	private MapValidationErrorService mapValidationErrorService;
+
+	DictionaryController dc = new DictionaryController();
 
 	/**
 	 * 
@@ -45,7 +47,6 @@ public class ExpressionController {
 	 */
 	@GetMapping(value = "/api/v1/expression/findByExpression")
 	public ResponseEntity<?> findByExpression(@Valid @RequestBody Expression expressionToFind) {
-
 		Expression expression = Utils
 				.convertExpressionToModel(service.findByExpression(expressionToFind.getExpression()));
 
@@ -60,7 +61,6 @@ public class ExpressionController {
 	 */
 	@GetMapping(value = "/api/v1/expression/findExpressionsByDictionaryId/{id}")
 	public ResponseEntity<?> findExpressionsByDictionaryId(@PathVariable(value = "id") long id) {
-
 		List<Expression> list = new ArrayList<>();
 		service.findByDictionaryId(id).forEach(expressionFromDB -> {
 			list.add(Utils.convertExpressionToModel(expressionFromDB));
@@ -70,8 +70,8 @@ public class ExpressionController {
 		return new ResponseEntity<List<Expression>>(list, HttpStatus.OK);
 	}
 
-	/**
-	 * Adds the current expression to the dictionary
+	/** FIX HERE
+	 * Adds the current expression to the dictionary 
 	 * 
 	 * @param expression The current expression
 	 * @param result
@@ -79,12 +79,11 @@ public class ExpressionController {
 	 */
 	@PostMapping(value = "/api/v1/expression/expressions")
 	public ResponseEntity<?> addExpression(@Valid @RequestBody ExpressionEntity entity, BindingResult result) {
-		
 		ResponseEntity<?> errorMap = mapValidationErrorService.mapValidation(result);
 		if (errorMap != null) {
 			return errorMap;
 		}
-		
+
 		Expression expression = Utils.convertExpressionToModel(service.addExpression((entity)));
 
 		return new ResponseEntity<Expression>(expression, HttpStatus.CREATED);
@@ -99,7 +98,6 @@ public class ExpressionController {
 	 */
 	@PutMapping(value = "/api/v1/expression/expressions")
 	public ResponseEntity<?> updateExpression(@Valid @RequestBody ExpressionEntity entity) {
-
 		ExpressionEntity expression = service.updateExpression(entity);
 
 		return new ResponseEntity<ExpressionEntity>(expression, HttpStatus.CREATED);
@@ -112,50 +110,11 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@DeleteMapping(value = "/api/v1/expression/expressions")
-	public ResponseEntity<?> removeExpression(@Valid @RequestBody Expression entity) {
-
-		service.removeExpressionById(entity.getId());
+	@DeleteMapping(value = "/api/v1/expression/expressions/{id}")
+	public ResponseEntity<?> removeExpression(@Valid @PathVariable("id") Long id) {
+		service.removeExpressionById(id);
 
 		return new ResponseEntity<String>("The expression has been removed!", HttpStatus.OK);
-	}
-
-	/**
-	 * Adds a hit mark to the expression
-	 * 
-	 * @param expression The current expression
-	 * @param result
-	 * @return
-	 */
-	@PostMapping(value = "/api/v1/expression/hit")
-	public ResponseEntity<?> markAsHit(@Valid @RequestBody ExpressionEntity entity) {
-
-		entity.addHit();
-		entity.getDictionary().addHit();
-
-		service.updateExpression(entity);
-
-		return new ResponseEntity<String>("Expression " + entity.getExpression() + " has been marked as a hit",
-				HttpStatus.OK);
-	}
-
-	/**
-	 * Adds a fail mark to the expression
-	 * 
-	 * @param expression the Current expression
-	 * @param result
-	 * @return
-	 */
-	@PostMapping(value = "/api/v1/expression/fail")
-	public ResponseEntity<?> markAsFail(@Valid @RequestBody ExpressionEntity entity) {
-
-		entity.addFail();
-		entity.getDictionary().addFail();
-
-		service.updateExpression(entity);
-
-		return new ResponseEntity<String>("Expression " + entity.getExpression() + " has been marked as a fail",
-				HttpStatus.OK);
 	}
 
 }

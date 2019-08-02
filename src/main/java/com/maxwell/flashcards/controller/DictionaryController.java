@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.DictionaryEntity;
@@ -53,9 +52,9 @@ public class DictionaryController {
 	 */
 	@GetMapping(value = "/api/v1/dictionary/dictionariesByUserId/{id}")
 	public ResponseEntity<?> findDictionaryByUserId(@PathVariable(value = "id") Long id) {
-		Dictionary dictionary = Utils.convertDictionaryToModel(service.findDictionaryByUserId(id));
+		List<Dictionary> dictionaries = Utils.convertDictionaryToModelList(service.findDictionaryByUserId(id));
 
-		return new ResponseEntity<Dictionary>(dictionary, HttpStatus.OK);
+		return new ResponseEntity<List<Dictionary>>(dictionaries, HttpStatus.OK);
 	}
 
 	/**
@@ -65,11 +64,9 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@GetMapping(value = "/api/v1/dictionary/findByDictionaryName")
-	public ResponseEntity<?> findByDictionaryName(@Valid @RequestParam DictionaryEntity DictionaryToFind) {
-		DictionaryEntity dictionary = new DictionaryEntity();
-
-		dictionary = service.findByDictionaryName(DictionaryToFind.getDictionaryName());
+	@PostMapping(value = "/api/v1/dictionary/findByDictionaryName")
+	public ResponseEntity<?> findByDictionaryName(@Valid @RequestBody DictionaryEntity DictionaryToFind) {
+		DictionaryEntity dictionary = service.findByDictionaryName(DictionaryToFind.getDictionaryName());
 
 		return new ResponseEntity<DictionaryEntity>(dictionary, HttpStatus.OK);
 	}
@@ -84,16 +81,14 @@ public class DictionaryController {
 	@PostMapping(value = "/api/v1/dictionary/dictionaries")
 	public ResponseEntity<?> addDictionary(@Valid @RequestBody DictionaryEntity request, BindingResult result) {
 
-		DictionaryEntity entity = new DictionaryEntity();
-
 		ResponseEntity<?> errorMap = mapValidationErrorService.mapValidation(result);
 		if (errorMap != null) {
 			return errorMap;
 		}
 
-		entity = service.addDictionary(request);
+		Dictionary model = Utils.convertDictionaryToModel(service.addDictionary(request));
 
-		return new ResponseEntity<DictionaryEntity>(entity, HttpStatus.CREATED);
+		return new ResponseEntity<Dictionary>(model, HttpStatus.CREATED);
 	}
 
 	/**
@@ -104,11 +99,15 @@ public class DictionaryController {
 	 * @return
 	 */
 	@PutMapping(value = "/api/v1/dictionary/dictionaries")
-	public ResponseEntity<?> updateDictionary(@Valid @RequestBody DictionaryEntity dictionary) {
+	public ResponseEntity<?> updateDictionary(@Valid @RequestBody Dictionary model) {
 
-		DictionaryEntity updatedDictionary = service.updateDictionary(dictionary);
+		DictionaryEntity updatedDictionary = service.findDictionaryById(model.getId());
 
-		return new ResponseEntity<DictionaryEntity>(updatedDictionary, HttpStatus.CREATED);
+		updatedDictionary.setDictionaryName(model.getDictionaryName());
+
+		service.addDictionary(updatedDictionary);
+
+		return new ResponseEntity<Boolean>(true, HttpStatus.CREATED);
 	}
 
 	/**
@@ -118,10 +117,8 @@ public class DictionaryController {
 	 * @param result
 	 * @return
 	 */
-	@DeleteMapping(value = "/api/v1/dictionary/dictionaries")
-	public ResponseEntity<?> removeDictionary(@Valid @RequestBody Dictionary dictionary) {
-		Long id = dictionary.getId();
-
+	@DeleteMapping(value = "/api/v1/dictionary/dictionaries/{id}")
+	public ResponseEntity<?> removeDictionary(@Valid @PathVariable("id") Long id) {
 		service.removeDictionaryById(id);
 
 		return new ResponseEntity<String>("Dictionary has been deleted", HttpStatus.OK);
@@ -148,4 +145,5 @@ public class DictionaryController {
 
 		return new ResponseEntity<List<Integer>>(totals, HttpStatus.OK);
 	}
+
 }

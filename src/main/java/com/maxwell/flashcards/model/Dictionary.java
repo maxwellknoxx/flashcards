@@ -1,7 +1,5 @@
 package com.maxwell.flashcards.model;
 
-import java.util.List;
-
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +17,6 @@ public class Dictionary {
 	private int hitWords;
 	private Long idUser;
 	private String username;
-	private List<Expression> expressions;
+	//private List<Expression> expressions;
 
 }

@@ -9,6 +9,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
@@ -33,14 +34,16 @@ public class ExpressionEntity {
 	private String meaning;
 
 	@Column(name = "hits")
+	@JsonIgnore
 	private int hits;
 
 	@Column(name = "fails")
+	@JsonIgnore
 	private int fails;
 	
 	@ManyToOne
 	@JoinColumn(name = "dictionary_id")
-	@JsonIgnore
+	@JsonBackReference("dictionary")
 	private DictionaryEntity dictionary;
 	
 	public void addHit() {

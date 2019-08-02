@@ -1,6 +1,5 @@
 package com.maxwell.flashcards.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -47,6 +46,6 @@ public class UserEntity {
 	private Boolean isLogged;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
-	private List<DictionaryEntity> dictionaries = new ArrayList<>();
+	private List<DictionaryEntity> dictionaries;
 
 }

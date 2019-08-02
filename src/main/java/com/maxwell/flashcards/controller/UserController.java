@@ -74,10 +74,9 @@ public class UserController {
 	 */
 	@PostMapping(value = "/api/v1/user/login")
 	public ResponseEntity<?> login(@Valid @RequestBody UserEntity entity) {
-		UserEntity userFromDB = new UserEntity();
 		User user;
 
-		userFromDB = service.findByUserName(entity.getUserName());
+		UserEntity userFromDB = service.findByUserName(entity.getUserName());
 		if (userFromDB != null && PasswordUtils.base64Decode(userFromDB.getPassword()).equals(entity.getPassword())) {
 			entity = userFromDB;
 			entity.setIsLogged(true);
@@ -96,12 +95,11 @@ public class UserController {
 	 */
 	@GetMapping(value = "/api/v1/user/logout/{id}")
 	public ResponseEntity<?> logout(@PathVariable(name = "id") Long id) {
-		UserEntity user = new UserEntity();
 
-		user = service.findUserById(id);
+		 UserEntity user = service.findUserById(id);
 		if (user != null) {
 			user.setIsLogged(false);
-			user = service.update(user);
+			service.update(user);
 		} else {
 			throw new ResourceNotFoundException("User not found");
 		}
@@ -109,7 +107,6 @@ public class UserController {
 		return new ResponseEntity<String>("User logged out successfully", HttpStatus.OK);
 	}
 
-	
 	/**
 	 * 
 	 * @param id
@@ -118,17 +115,17 @@ public class UserController {
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@GetMapping(value = "/api/v1/user/isLogged/{id}")
 	public ResponseEntity<?> isLogged(@PathVariable(name = "id") Long id) {
-		UserEntity userFromDB = new UserEntity();
-		User user;
 
-		userFromDB = service.findUserById(id);
-		if (userFromDB != null && userFromDB.getIsLogged().equals(true)) {
-			user = Utils.convertUserEntityToModel(userFromDB);
+		UserEntity userFromDB = service.findUserById(id);
+		if (userFromDB != null) {
+			if (userFromDB.getIsLogged().equals(true)) {
+				return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+			}
 		} else {
 			throw new ResourceNotFoundException("User not found");
 		}
-
-		return new ResponseEntity<User>(user, HttpStatus.OK);
 	}
 
 	/**
@@ -136,11 +133,10 @@ public class UserController {
 	 * @param id
 	 * @return
 	 */
-	@GetMapping(value = "/api/v1/user/getUserById/{id}")
+	@GetMapping(value = "/api/v1/user/users/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
-		UserEntity userFromDB = new UserEntity();
 
-		userFromDB = service.findUserById(id);
+		UserEntity userFromDB  = service.findUserById(id);
 		if (userFromDB != null) {
 			return new ResponseEntity<UserEntity>(userFromDB, HttpStatus.OK);
 		} else {

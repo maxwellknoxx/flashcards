@@ -1,6 +1,5 @@
 package com.maxwell.flashcards.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -14,7 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -42,11 +41,11 @@ public class DictionaryEntity {
 
 	@ManyToOne
 	@JoinColumn(name = "user_id")
-	@JsonIgnore
+	@JsonBackReference("user")
 	private UserEntity user;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "dictionary")
-	private List<ExpressionEntity> expressions = new ArrayList<>();
+	private List<ExpressionEntity> expressions;
 
 	public void addHit() {
 		this.hitWords = this.hitWords + 1;

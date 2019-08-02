@@ -12,6 +12,6 @@ public interface DictionaryService {
 	
 	DictionaryEntity findDictionaryById(Long id);
 	
-	DictionaryEntity findDictionaryByUserId(Long id);
+	List<DictionaryEntity> findDictionaryByUserId(Long id);
 	
 }
