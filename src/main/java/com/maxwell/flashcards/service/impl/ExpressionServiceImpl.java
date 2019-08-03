@@ -25,12 +25,13 @@ public class ExpressionServiceImpl implements ExpressionService {
 		}
 	}
 
-	public void removeExpressionById(Long id) {
+	public Boolean removeExpressionById(Long id) throws ResourceNotFoundException {
 		ExpressionEntity expression = repository.findById(id).orElseThrow();
 		if (Objects.isNull(expression)) {
-			throw new ResourceNotFoundException("Expression " + id + " does not exist");
+			return false;
 		}
 		repository.deleteById(id);
+		return true;
 	}
 
 	public ExpressionEntity updateExpression(ExpressionEntity expression) {
@@ -43,28 +44,28 @@ public class ExpressionServiceImpl implements ExpressionService {
 	}
 
 	@Override
-	public List<ExpressionEntity> findAll() {
+	public List<ExpressionEntity> findAll() throws ResourceNotFoundException {
 		List<ExpressionEntity> listExpressions = repository.findAll();
 		if (listExpressions == null) {
-			throw new ResourceNotFoundException("Something went wrong -> findAll");
+			return null;
 		}
 		return listExpressions;
 	}
 
 	@Override
-	public ExpressionEntity findByExpression(String expression) {
+	public ExpressionEntity findByExpression(String expression) throws ResourceNotFoundException {
 		ExpressionEntity expressionFound = repository.findByExpression(expression);
 		if (expressionFound == null) {
-			throw new ResourceNotFoundException("Something went wrong -> findByExpression");
+			return null;
 		}
 		return expressionFound;
 	}
 
 	@Override
-	public List<ExpressionEntity> findByDictionaryId(Long dictionariId) {
+	public List<ExpressionEntity> findByDictionaryId(Long dictionariId) throws ResourceNotFoundException {
 		List<ExpressionEntity> list = repository.findByDictionaryId(dictionariId);
 		if (list == null) {
-			throw new ResourceNotFoundException("Something went wrong -> findByDictionaryId");
+			return null;
 		}
 		return list;
 	}

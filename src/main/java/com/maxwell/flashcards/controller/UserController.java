@@ -49,7 +49,12 @@ public class UserController {
 		entity.setIsLogged(true);
 
 		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
-		UserCreated user = Utils.convertUserCreatedEntityToModel(service.save(entity));
+		UserCreated user;
+		try {
+			user = Utils.convertUserCreatedEntityToModel(service.save(entity));
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Something went wrong -> create user " + e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 
 		return new ResponseEntity<UserCreated>(user, HttpStatus.CREATED);
 	}
@@ -63,7 +68,12 @@ public class UserController {
 	public ResponseEntity<?> update(@Valid @RequestBody UserEntity entity) {
 
 		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
-		User user = Utils.convertUserEntityToModel(service.update(entity));
+		User user;
+		try {
+			user = Utils.convertUserEntityToModel(service.update(entity));
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Something went wrong -> update user " + e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
 
 		return new ResponseEntity<User>(user, HttpStatus.CREATED);
 	}
@@ -78,12 +88,17 @@ public class UserController {
 		User user;
 
 		UserEntity userFromDB = service.findByUserName(entity.getUserName());
-		if (userFromDB != null && PasswordUtils.base64Decode(userFromDB.getPassword()).equals(entity.getPassword())) {
-			entity = userFromDB;
-			entity.setIsLogged(true);
-			user = Utils.convertUserEntityToModel(service.update(entity));
-		} else {
-			throw new ResourceNotFoundException("Please, verify login information");
+		try {
+			if (userFromDB != null
+					&& PasswordUtils.base64Decode(userFromDB.getPassword()).equals(entity.getPassword())) {
+				entity = userFromDB;
+				entity.setIsLogged(true);
+				user = Utils.convertUserEntityToModel(service.update(entity));
+			} else {
+				return new ResponseEntity<String>("Please, verify login information", HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return new ResponseEntity<String>("Please, verify login information", HttpStatus.OK);
 		}
 
 		return new ResponseEntity<User>(user, HttpStatus.OK);
@@ -97,12 +112,12 @@ public class UserController {
 	@GetMapping(value = "/api/v1/user/logout/{id}")
 	public ResponseEntity<?> logout(@PathVariable(name = "id") Long id) {
 
-		 UserEntity user = service.findUserById(id);
+		UserEntity user = service.findUserById(id);
 		if (user != null) {
 			user.setIsLogged(false);
 			service.update(user);
 		} else {
-			throw new ResourceNotFoundException("User not found");
+			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
 
 		return new ResponseEntity<String>("User logged out successfully", HttpStatus.OK);
@@ -125,7 +140,7 @@ public class UserController {
 				return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 			}
 		} else {
-			throw new ResourceNotFoundException("User not found");
+			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -137,11 +152,11 @@ public class UserController {
 	@GetMapping(value = "/api/v1/user/users/{id}")
 	public ResponseEntity<?> getUserById(@PathVariable("id") Long id) {
 
-		UserEntity userFromDB  = service.findUserById(id);
+		UserEntity userFromDB = service.findUserById(id);
 		if (userFromDB != null) {
 			return new ResponseEntity<UserEntity>(userFromDB, HttpStatus.OK);
 		} else {
-			throw new ResourceNotFoundException("User not found");
+			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -155,20 +170,18 @@ public class UserController {
 
 		UserEntity userFromDB = service.findUserByEmail(entity.getEmail());
 		if (userFromDB != null) {
-			if(userFromDB.getAnswer().equals(entity.getAnswer())) {
-				if(userFromDB.getUserName().equals(entity.getUserName())) {
+			if (userFromDB.getAnswer().equals(entity.getAnswer())) {
+				if (userFromDB.getUserName().equals(entity.getUserName())) {
 					userFromDB.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
 					service.update(userFromDB);
 					return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 				}
 			}
 		} else {
-			return new ResponseEntity<String>("User not found", HttpStatus.OK);
+			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
 		return new ResponseEntity<String>("Please, check your information", HttpStatus.OK);
 	}
-	
-	
 
 	/**
 	 * 
@@ -178,12 +191,17 @@ public class UserController {
 	@PostMapping(value = "/api/v1/user/getUser")
 	public ResponseEntity<?> getUser(@Valid @RequestBody UserEntity entity) {
 
-		User userFromDB = Utils.convertUserEntityToModel(service.findByUserName(entity.getUserName()));
+		User userFromDB;
+		try {
+			userFromDB = Utils.convertUserEntityToModel(service.findByUserName(entity.getUserName()));
+		} catch (ResourceNotFoundException e) {
+			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
+		}
 		if (!userFromDB.getUsername().isEmpty()) {
 			return new ResponseEntity<User>(userFromDB, HttpStatus.OK);
-		} else {
-			throw new ResourceNotFoundException("User not found");
 		}
+
+		return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 	}
 
 }

@@ -25,12 +25,13 @@ public class DictionaryServiceImpl implements DictionaryService {
 		}
 	}
 
-	public void removeDictionaryById(Long id) {
+	public Boolean removeDictionaryById(Long id) throws ResourceNotFoundException {
 		DictionaryEntity dictionary = repository.findDictionaryById(id);
 		if (Objects.isNull(dictionary)) {
-			throw new ResourceNotFoundException("Dictionary " + id + " does not exist");
+			return false;
 		}
 		repository.deleteById(id);
+		return true;
 	}
 
 	public DictionaryEntity updateDictionary(DictionaryEntity dictionary) {
@@ -42,37 +43,37 @@ public class DictionaryServiceImpl implements DictionaryService {
 	}
 
 	@Override
-	public List<DictionaryEntity> findAll() {
+	public List<DictionaryEntity> findAll() throws ResourceNotFoundException{
 		List<DictionaryEntity> list = repository.findAll();
 		if (list == null) {
-			throw new ResourceNotFoundException("Something went wrong -> findAll");
+			return null;
 		}
 		return list;
 	}
 
 	@Override
-	public DictionaryEntity findByDictionaryName(String dictionaryName) {
+	public DictionaryEntity findByDictionaryName(String dictionaryName) throws ResourceNotFoundException {
 		DictionaryEntity dictionary = repository.findByDictionaryName(dictionaryName);
 		if (Objects.isNull(dictionary)) {
-			throw new ResourceNotFoundException("Dictionary " + dictionaryName + " does not exist");
+			return null;
 		}
 		return dictionary;
 	}
 
 	@Override
-	public DictionaryEntity findDictionaryById(Long id) {
+	public DictionaryEntity findDictionaryById(Long id) throws ResourceNotFoundException {
 		DictionaryEntity dictionary = repository.findDictionaryById(id);
 		if (Objects.isNull(dictionary)) {
-			throw new ResourceNotFoundException("Dictionary " + id + " does not exist");
+			return null;
 		}
 		return dictionary;
 	}
 
 	@Override
-	public List<DictionaryEntity> findDictionaryByUserId(Long id) {
+	public List<DictionaryEntity> findDictionaryByUserId(Long id) throws ResourceNotFoundException {
 		List<DictionaryEntity> dictionary = repository.findDictionaryByUserId(id);
 		if (Objects.isNull(dictionary)) {
-			throw new ResourceNotFoundException("User " + id + " does not exist");
+			return null;
 		}
 		return dictionary;
 	}

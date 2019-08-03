@@ -25,10 +25,10 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	public UserEntity findUserById(Long id) {
+	public UserEntity findUserById(Long id) throws ResourceNotFoundException {
 		UserEntity user = repository.findById(id).orElseThrow();
 		if (Objects.isNull(user)) {
-			throw new ResourceNotFoundException("User " + id + " not found");
+			return null;
 		}
 		return user;
 	}
@@ -44,9 +44,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserEntity findByUserName(String userName) {
 		UserEntity user = repository.findByUserName(userName);
-		if (Objects.isNull(user)) {
-			throw new ResourceNotFoundException("User " + user + " not found");
-		}
 		return user;
 	}
 
