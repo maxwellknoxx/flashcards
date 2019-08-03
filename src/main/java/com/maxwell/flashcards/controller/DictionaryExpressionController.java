@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.DictionaryEntity;
 import com.maxwell.flashcards.entity.ExpressionEntity;
-import com.maxwell.flashcards.model.Expression;
 import com.maxwell.flashcards.service.impl.DictionaryServiceImpl;
 import com.maxwell.flashcards.service.impl.ExpressionServiceImpl;
-import com.maxwell.flashcards.util.Utils;
 
 @RestController
 @CrossOrigin
@@ -34,11 +32,13 @@ public class DictionaryExpressionController {
 	 */
 	@PostMapping(path = "/api/v1/dictionaryExpression/hit")
 	public ResponseEntity<?> hitWord(@Valid @RequestBody ExpressionEntity entity) {
+		System.out.println(entity.toString());
 		entity.addHit();
 		entity.setDictionary(hitDictionary(entity.getDictionary().getId()));
-		Expression expression = Utils.convertExpressionToModel(expressionService.updateExpression(entity));
+		expressionService.updateExpression(entity);
 
-		return new ResponseEntity<Expression>(expression, HttpStatus.OK);
+		return new ResponseEntity<String>("The expression " + entity.getExpression() + " has been markes as a hit",
+				HttpStatus.OK);
 	}
 
 	/**
@@ -50,9 +50,10 @@ public class DictionaryExpressionController {
 	public ResponseEntity<?> failWord(@Valid @RequestBody ExpressionEntity entity) {
 		entity.addFail();
 		entity.setDictionary(failDictionary(entity.getDictionary().getId()));
-		Expression expression = Utils.convertExpressionToModel(expressionService.updateExpression(entity));
+		expressionService.updateExpression(entity);
 
-		return new ResponseEntity<Expression>(expression, HttpStatus.OK);
+		return new ResponseEntity<String>("The expression " + entity.getExpression() + " has been markes as a hit",
+				HttpStatus.OK);
 	}
 
 	public DictionaryEntity hitDictionary(Long id) {

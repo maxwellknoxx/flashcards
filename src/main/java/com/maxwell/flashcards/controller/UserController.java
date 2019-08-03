@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.maxwell.flashcards.entity.UserEntity;
 import com.maxwell.flashcards.exception.ResourceNotFoundException;
 import com.maxwell.flashcards.model.User;
+import com.maxwell.flashcards.model.UserCreated;
 import com.maxwell.flashcards.service.impl.MapValidationErrorService;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
 import com.maxwell.flashcards.util.PasswordUtils;
@@ -48,9 +49,9 @@ public class UserController {
 		entity.setIsLogged(true);
 
 		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
-		User user = Utils.convertUserEntityToModel((service.save(entity)));
+		UserCreated user = Utils.convertUserCreatedEntityToModel(service.save(entity));
 
-		return new ResponseEntity<User>(user, HttpStatus.CREATED);
+		return new ResponseEntity<UserCreated>(user, HttpStatus.CREATED);
 	}
 
 	/**
@@ -149,16 +150,25 @@ public class UserController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(value = "/api/v1/user/getUserByEmail")
-	public ResponseEntity<?> getUserByEmail(@Valid @RequestBody UserEntity entity) {
+	@PostMapping(value = "/api/v1/user/validations")
+	public ResponseEntity<?> validations(@Valid @RequestBody UserEntity entity) {
 
-		User userFromDB = Utils.convertUserEntityToModel(service.findUserByEmail(entity.getEmail()));
-		if (!userFromDB.getUsername().isEmpty()) {
-			return new ResponseEntity<User>(userFromDB, HttpStatus.OK);
+		UserEntity userFromDB = service.findUserByEmail(entity.getEmail());
+		if (userFromDB != null) {
+			if(userFromDB.getAnswer().equals(entity.getAnswer())) {
+				if(userFromDB.getUserName().equals(entity.getUserName())) {
+					userFromDB.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
+					service.update(userFromDB);
+					return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+				}
+			}
 		} else {
-			throw new ResourceNotFoundException("User not found");
+			return new ResponseEntity<String>("User not found", HttpStatus.OK);
 		}
+		return new ResponseEntity<String>("Please, check your information", HttpStatus.OK);
 	}
+	
+	
 
 	/**
 	 * 

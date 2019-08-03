@@ -10,22 +10,21 @@ import com.maxwell.flashcards.entity.UserEntity;
 import com.maxwell.flashcards.model.Dictionary;
 import com.maxwell.flashcards.model.Expression;
 import com.maxwell.flashcards.model.User;
+import com.maxwell.flashcards.model.UserCreated;
 
 public class Utils {
 
 	public static Dictionary convertDictionaryToModel(DictionaryEntity entity) {
 		return Dictionary.builder().id(entity.getId()).dictionaryName(entity.getDictionaryName())
 				.idUser(entity.getUser().getId()).username(entity.getUser().getUserName())
-				.failWords(entity.getFailWords()).hitWords(entity.getHitWords())
-				.build();
+				.failWords(entity.getFailWords()).hitWords(entity.getHitWords()).build();
 	}
 
 	public static List<Dictionary> convertDictionaryToModelList(List<DictionaryEntity> entities) {
 		return entities.stream().filter(Objects::nonNull)
 				.map(entity -> Dictionary.builder().id(entity.getId()).dictionaryName(entity.getDictionaryName())
 						.idUser(entity.getUser().getId()).username(entity.getUser().getUserName())
-						.failWords(entity.getFailWords()).hitWords(entity.getHitWords())
-						.build())
+						.failWords(entity.getFailWords()).hitWords(entity.getHitWords()).build())
 				.collect(Collectors.toList());
 	}
 
@@ -47,6 +46,11 @@ public class Utils {
 	public static User convertUserEntityToModel(UserEntity entity) {
 		return User.builder().id(entity.getId()).username(entity.getUserName()).email(entity.getEmail())
 				.isLogged(entity.getIsLogged()).dictionaries(convertDictionaryToModelList(entity.getDictionaries()))
+				.build();
+	}
+
+	public static UserCreated convertUserCreatedEntityToModel(UserEntity entity) {
+		return UserCreated.builder().id(entity.getId()).username(entity.getUserName()).isLogged(entity.getIsLogged())
 				.build();
 	}
 
