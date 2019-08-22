@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.maxwell.flashcards.entity.UserEntity;
-import com.maxwell.flashcards.exception.ResourceNotFoundException;
 import com.maxwell.flashcards.model.User;
 import com.maxwell.flashcards.repository.UserRepository;
 import com.maxwell.flashcards.service.UserService;
@@ -25,8 +24,8 @@ public class UserServiceImpl implements UserService {
 		return UserMapper.convertEntityToModel(entity);
 	}
 
-	public UserEntity findUserById(Long id) throws ResourceNotFoundException {
-		UserEntity user = repository.findById(id).orElseThrow();
+	public UserEntity findUserById(Long id) {
+		UserEntity user = repository.findById(id).orElse(null);
 		if (user == null) {
 			return null;
 		}
