@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 		if (entity == null) {
 			return null;
 		}
-		return UserMapper.convertEntityToModel(entity);
+		return UserMapper.convertEntityToModelCreated(entity);
 	}
 
 	public UserEntity findUserById(Long id) {

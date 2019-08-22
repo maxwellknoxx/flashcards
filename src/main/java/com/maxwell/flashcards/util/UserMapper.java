@@ -18,6 +18,11 @@ public class UserMapper {
 				.dictionaries(DictionaryMapper.convertEntityToModelList(entity.getDictionaries())).build();
 	}
 
+	public static User convertEntityToModelCreated(UserEntity entity) {
+		return User.builder().id(entity.getId()).username(entity.getUserName()).email(entity.getEmail())
+				.isLogged(entity.getIsLogged()).build();
+	}
+
 	public static List<User> convertEntityToModelList(List<UserEntity> entities) {
 		return entities.stream().filter(Objects::nonNull)
 				.map(entity -> User.builder().id(entity.getId()).username(entity.getUserName()).email(entity.getEmail())
