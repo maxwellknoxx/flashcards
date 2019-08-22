@@ -2,16 +2,16 @@ package com.maxwell.flashcards.service;
 
 import java.util.List;
 
-import com.maxwell.flashcards.entity.DictionaryEntity;
+import com.maxwell.flashcards.model.Dictionary;
 
 public interface DictionaryService {
 
-	List<DictionaryEntity> findAll();
+	List<Dictionary> findAll();
 	
-	DictionaryEntity findByDictionaryName(String dictionaryName);
+	Dictionary findByDictionaryName(String dictionaryName);
 	
-	DictionaryEntity findDictionaryById(Long id);
+	Dictionary findDictionaryById(Long id);
 	
-	List<DictionaryEntity> findDictionaryByUserId(Long id);
+	List<Dictionary> findDictionaryByUserId(Long id);
 	
 }

@@ -16,13 +16,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.flashcards.entity.UserEntity;
-import com.maxwell.flashcards.exception.ResourceNotFoundException;
 import com.maxwell.flashcards.model.User;
-import com.maxwell.flashcards.model.UserCreated;
 import com.maxwell.flashcards.service.impl.MapValidationErrorService;
 import com.maxwell.flashcards.service.impl.UserServiceImpl;
 import com.maxwell.flashcards.util.PasswordUtils;
-import com.maxwell.flashcards.util.Utils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -46,17 +43,15 @@ public class UserController {
 			return errorMap;
 		}
 
-		entity.setIsLogged(true);
+		entity.setIsLogged(false);
 
 		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
-		UserCreated user;
-		try {
-			user = Utils.convertUserCreatedEntityToModel(service.save(entity));
-		} catch (Exception e) {
-			return new ResponseEntity<String>("Something went wrong -> create user " + e.getMessage(), HttpStatus.BAD_REQUEST);
+		User user = service.save(entity);
+		if (user == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<UserCreated>(user, HttpStatus.CREATED);
+		return new ResponseEntity<Boolean>(true, HttpStatus.CREATED);
 	}
 
 	/**
@@ -68,14 +63,12 @@ public class UserController {
 	public ResponseEntity<?> update(@Valid @RequestBody UserEntity entity) {
 
 		entity.setPassword(PasswordUtils.base64Encode(entity.getPassword()));
-		User user;
-		try {
-			user = Utils.convertUserEntityToModel(service.update(entity));
-		} catch (Exception e) {
-			return new ResponseEntity<String>("Something went wrong -> update user " + e.getMessage(), HttpStatus.BAD_REQUEST);
+		User user = service.update(entity);
+		if (user == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<User>(user, HttpStatus.CREATED);
+		return new ResponseEntity<Boolean>(true, HttpStatus.CREATED);
 	}
 
 	/**
@@ -87,21 +80,14 @@ public class UserController {
 	public ResponseEntity<?> login(@Valid @RequestBody UserEntity entity) {
 		User user;
 
-		UserEntity userFromDB = service.findByUserName(entity.getUserName());
-		try {
-			if (userFromDB != null
-					&& PasswordUtils.base64Decode(userFromDB.getPassword()).equals(entity.getPassword())) {
-				entity = userFromDB;
-				entity.setIsLogged(true);
-				user = Utils.convertUserEntityToModel(service.update(entity));
-			} else {
-				return new ResponseEntity<String>("Please, verify login information", HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			return new ResponseEntity<String>("Please, verify login information", HttpStatus.OK);
+		UserEntity userFromDB = service.getByUserName(entity.getUserName());
+		if (userFromDB != null && PasswordUtils.base64Decode(userFromDB.getPassword()).equals(entity.getPassword())) {
+			entity = userFromDB;
+			entity.setIsLogged(true);
+			user = service.update(entity);
+			return new ResponseEntity<User>(user, HttpStatus.OK);
 		}
-
-		return new ResponseEntity<User>(user, HttpStatus.OK);
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
 	/**
@@ -116,11 +102,9 @@ public class UserController {
 		if (user != null) {
 			user.setIsLogged(false);
 			service.update(user);
-		} else {
-			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		}
-
-		return new ResponseEntity<String>("User logged out successfully", HttpStatus.OK);
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
 	/**
@@ -136,12 +120,9 @@ public class UserController {
 		if (userFromDB != null) {
 			if (userFromDB.getIsLogged().equals(true)) {
 				return new ResponseEntity<Boolean>(true, HttpStatus.OK);
-			} else {
-				return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 			}
-		} else {
-			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
 	/**
@@ -155,9 +136,8 @@ public class UserController {
 		UserEntity userFromDB = service.findUserById(id);
 		if (userFromDB != null) {
 			return new ResponseEntity<UserEntity>(userFromDB, HttpStatus.OK);
-		} else {
-			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
 	/**
@@ -168,7 +148,7 @@ public class UserController {
 	@PostMapping(value = "/api/v1/user/validations")
 	public ResponseEntity<?> validations(@Valid @RequestBody UserEntity entity) {
 
-		UserEntity userFromDB = service.findUserByEmail(entity.getEmail());
+		UserEntity userFromDB = service.getUserByEmail(entity.getEmail());
 		if (userFromDB != null) {
 			if (userFromDB.getAnswer().equals(entity.getAnswer())) {
 				if (userFromDB.getUserName().equals(entity.getUserName())) {
@@ -177,10 +157,8 @@ public class UserController {
 					return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 				}
 			}
-		} else {
-			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<String>("Please, check your information", HttpStatus.OK);
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
 	/**
@@ -191,17 +169,15 @@ public class UserController {
 	@PostMapping(value = "/api/v1/user/getUser")
 	public ResponseEntity<?> getUser(@Valid @RequestBody UserEntity entity) {
 
-		User userFromDB;
-		try {
-			userFromDB = Utils.convertUserEntityToModel(service.findByUserName(entity.getUserName()));
-		} catch (ResourceNotFoundException e) {
-			return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
+		User userFromDB = service.findByUserName(entity.getUserName());
+		if (userFromDB == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
-		if (!userFromDB.getUsername().isEmpty()) {
-			return new ResponseEntity<User>(userFromDB, HttpStatus.OK);
+		if (userFromDB.getUsername().isEmpty()) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
 
-		return new ResponseEntity<String>("User not found", HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<User>(userFromDB, HttpStatus.OK);
 	}
 
 }

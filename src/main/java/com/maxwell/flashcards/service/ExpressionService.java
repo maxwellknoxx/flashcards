@@ -2,14 +2,14 @@ package com.maxwell.flashcards.service;
 
 import java.util.List;
 
-import com.maxwell.flashcards.entity.ExpressionEntity;
+import com.maxwell.flashcards.model.Expression;
 
 public interface ExpressionService {
 
-	List<ExpressionEntity> findAll();
+	List<Expression> findAll();
 
-	ExpressionEntity findByExpression(String expression);
+	Expression findByExpression(String expression);
 	
-	List<ExpressionEntity> findByDictionaryId(Long dictionariId);
+	List<Expression> findByDictionaryId(Long dictionariId);
 
 }

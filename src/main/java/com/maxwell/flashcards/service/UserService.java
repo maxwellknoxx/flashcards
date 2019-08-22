@@ -1,13 +1,14 @@
 package com.maxwell.flashcards.service;
 
 import com.maxwell.flashcards.entity.UserEntity;
+import com.maxwell.flashcards.model.User;
 
 public interface UserService {
 	
-	UserEntity save(UserEntity user);
+	User save(UserEntity user);
 	
-	UserEntity findByUserName(String userName);
+	User findByUserName(String userName);
 	
-	UserEntity findUserByEmail(String email);
+	User findUserByEmail(String email);
 	
 }

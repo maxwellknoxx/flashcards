@@ -17,6 +17,5 @@ public class Dictionary {
 	private int hitWords;
 	private Long idUser;
 	private String username;
-	//private List<Expression> expressions;
 
 }

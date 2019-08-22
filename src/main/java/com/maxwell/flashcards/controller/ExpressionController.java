@@ -1,6 +1,5 @@
 package com.maxwell.flashcards.controller;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +22,6 @@ import com.maxwell.flashcards.entity.ExpressionEntity;
 import com.maxwell.flashcards.model.Expression;
 import com.maxwell.flashcards.service.impl.ExpressionServiceImpl;
 import com.maxwell.flashcards.service.impl.MapValidationErrorService;
-import com.maxwell.flashcards.util.Utils;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -35,8 +33,6 @@ public class ExpressionController {
 	@Autowired
 	private MapValidationErrorService mapValidationErrorService;
 
-	DictionaryController dc = new DictionaryController();
-
 	/**
 	 * 
 	 * Finds an expression
@@ -47,8 +43,10 @@ public class ExpressionController {
 	 */
 	@GetMapping(value = "/api/v1/expression/findByExpression")
 	public ResponseEntity<?> findByExpression(@Valid @RequestBody Expression expressionToFind) {
-		Expression expression = Utils
-				.convertExpressionToModel(service.findByExpression(expressionToFind.getExpression()));
+		Expression expression = service.findByExpression(expressionToFind.getExpression());
+		if (expression == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+		}
 
 		return new ResponseEntity<Expression>(expression, HttpStatus.OK);
 	}
@@ -59,19 +57,18 @@ public class ExpressionController {
 	 * @param result
 	 * @return
 	 */
-	@GetMapping(value = "/api/v1/expression/findExpressionsByDictionaryId/{id}")
+	@GetMapping(value = "/api/v1/expression/expressionsByDictionaryId/{id}")
 	public ResponseEntity<?> findExpressionsByDictionaryId(@PathVariable(value = "id") long id) {
-		List<Expression> list = new ArrayList<>();
-		service.findByDictionaryId(id).forEach(expressionFromDB -> {
-			list.add(Utils.convertExpressionToModel(expressionFromDB));
-		});
+		List<Expression> list = service.findByDictionaryId(id);
+		if (list == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+		}
 		Collections.shuffle(list);
 
 		return new ResponseEntity<List<Expression>>(list, HttpStatus.OK);
 	}
 
-	/** FIX HERE
-	 * Adds the current expression to the dictionary 
+	/**
 	 * 
 	 * @param expression The current expression
 	 * @param result
@@ -84,7 +81,10 @@ public class ExpressionController {
 			return errorMap;
 		}
 
-		Expression expression = Utils.convertExpressionToModel(service.addExpression((entity)));
+		Expression expression = service.addExpression((entity));
+		if (expression == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+		}
 
 		return new ResponseEntity<Expression>(expression, HttpStatus.CREATED);
 	}
@@ -98,9 +98,12 @@ public class ExpressionController {
 	 */
 	@PutMapping(value = "/api/v1/expression/expressions")
 	public ResponseEntity<?> updateExpression(@Valid @RequestBody ExpressionEntity entity) {
-		ExpressionEntity expression = service.updateExpression(entity);
+		Expression expression = service.updateExpression(entity);
+		if (expression == null) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+		}
 
-		return new ResponseEntity<ExpressionEntity>(expression, HttpStatus.CREATED);
+		return new ResponseEntity<Expression>(expression, HttpStatus.CREATED);
 	}
 
 	/**
@@ -112,9 +115,11 @@ public class ExpressionController {
 	 */
 	@DeleteMapping(value = "/api/v1/expression/expressions/{id}")
 	public ResponseEntity<?> removeExpression(@Valid @PathVariable("id") Long id) {
-		service.removeExpressionById(id);
+		if (service.removeExpressionById(id)) {
+			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+		}
 
-		return new ResponseEntity<String>("The expression has been removed!", HttpStatus.OK);
+		return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
 }

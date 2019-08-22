@@ -30,7 +30,7 @@ public class DictionaryExpressionController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(path = "/api/v1/dictionaryExpression/hit")
+	@PostMapping(path = "/api/v1/dictionaryExpression/hits")
 	public ResponseEntity<?> hitWord(@Valid @RequestBody ExpressionEntity entity) {
 		System.out.println(entity.toString());
 		entity.addHit();
@@ -46,7 +46,7 @@ public class DictionaryExpressionController {
 	 * @param entity
 	 * @return
 	 */
-	@PostMapping(path = "/api/v1/dictionaryExpression/fail")
+	@PostMapping(path = "/api/v1/dictionaryExpression/fails")
 	public ResponseEntity<?> failWord(@Valid @RequestBody ExpressionEntity entity) {
 		entity.addFail();
 		entity.setDictionary(failDictionary(entity.getDictionary().getId()));
@@ -59,17 +59,17 @@ public class DictionaryExpressionController {
 	public DictionaryEntity hitDictionary(Long id) {
 		DictionaryEntity entity = getDictionary(id);
 		entity.addHit();
-		return dictionaryService.updateDictionary(entity);
+		return dictionaryService.updateDictionaryEntity(entity);
 	}
 
 	public DictionaryEntity failDictionary(Long id) {
 		DictionaryEntity entity = getDictionary(id);
 		entity.addFail();
-		return dictionaryService.updateDictionary(entity);
+		return dictionaryService.updateDictionaryEntity(entity);
 	}
 
 	public DictionaryEntity getDictionary(Long id) {
-		return dictionaryService.findDictionaryById(id);
+		return dictionaryService.getDictionaryById(id);
 	}
 
 }

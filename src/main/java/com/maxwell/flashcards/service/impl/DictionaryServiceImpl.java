@@ -1,15 +1,15 @@
 package com.maxwell.flashcards.service.impl;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.maxwell.flashcards.entity.DictionaryEntity;
-import com.maxwell.flashcards.exception.ResourceNotFoundException;
+import com.maxwell.flashcards.model.Dictionary;
 import com.maxwell.flashcards.repository.DictionaryRepository;
 import com.maxwell.flashcards.service.DictionaryService;
+import com.maxwell.flashcards.util.DictionaryMapper;
 
 @Service
 public class DictionaryServiceImpl implements DictionaryService {
@@ -17,65 +17,86 @@ public class DictionaryServiceImpl implements DictionaryService {
 	@Autowired
 	private DictionaryRepository repository;
 
-	public DictionaryEntity addDictionary(DictionaryEntity dictionary) {
-		try {
-			return repository.save(dictionary);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong -> save dictionary -> " + e.getMessage());
+	public Dictionary addDictionary(DictionaryEntity dictionary) {
+		DictionaryEntity entity = repository.save(dictionary);
+		if (entity == null) {
+			return null;
 		}
+		return DictionaryMapper.convertEntityToModel(entity);
 	}
 
-	public Boolean removeDictionaryById(Long id) throws ResourceNotFoundException {
-		DictionaryEntity dictionary = repository.findDictionaryById(id);
-		if (Objects.isNull(dictionary)) {
+	public Boolean removeDictionaryById(Long id) {
+		try {
+			repository.deleteById(id);
+			return true;
+		} catch (Exception e) {
 			return false;
 		}
-		repository.deleteById(id);
-		return true;
 	}
 
-	public DictionaryEntity updateDictionary(DictionaryEntity dictionary) {
-		try {
-			return repository.save(dictionary);
-		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong -> update dictionary -> " + e.getMessage());
+	public Dictionary updateDictionary(DictionaryEntity dictionary) {
+		DictionaryEntity entity = repository.save(dictionary);
+		if (entity == null) {
+			return null;
 		}
+		return DictionaryMapper.convertEntityToModel(entity);
+	}
+	
+	public DictionaryEntity updateDictionaryEntity(DictionaryEntity dictionary) {
+		DictionaryEntity entity = repository.save(dictionary);
+		if (entity == null) {
+			return null;
+		}
+		return entity;
 	}
 
 	@Override
-	public List<DictionaryEntity> findAll() throws ResourceNotFoundException{
+	public List<Dictionary> findAll() {
 		List<DictionaryEntity> list = repository.findAll();
-		if (list == null) {
+		if(list.isEmpty()) {
 			return null;
 		}
-		return list;
+		return  DictionaryMapper.convertEntityToModelList(list);
 	}
 
 	@Override
-	public DictionaryEntity findByDictionaryName(String dictionaryName) throws ResourceNotFoundException {
+	public Dictionary findByDictionaryName(String dictionaryName) {
 		DictionaryEntity dictionary = repository.findByDictionaryName(dictionaryName);
-		if (Objects.isNull(dictionary)) {
+		if(dictionary == null) {
 			return null;
 		}
+		return DictionaryMapper.convertEntityToModel(dictionary);
+	}
+
+	public DictionaryEntity getDictionaryName(String dictionaryName) {
+		DictionaryEntity dictionary = repository.findByDictionaryName(dictionaryName);
 		return dictionary;
 	}
 
 	@Override
-	public DictionaryEntity findDictionaryById(Long id) throws ResourceNotFoundException {
+	public Dictionary findDictionaryById(Long id) {
 		DictionaryEntity dictionary = repository.findDictionaryById(id);
-		if (Objects.isNull(dictionary)) {
+		if(dictionary == null) {
+			return null;
+		}
+		return DictionaryMapper.convertEntityToModel(dictionary);
+	}
+	
+	public DictionaryEntity getDictionaryById(Long id) {
+		DictionaryEntity dictionary = repository.findDictionaryById(id);
+		if(dictionary == null) {
 			return null;
 		}
 		return dictionary;
 	}
 
 	@Override
-	public List<DictionaryEntity> findDictionaryByUserId(Long id) throws ResourceNotFoundException {
-		List<DictionaryEntity> dictionary = repository.findDictionaryByUserId(id);
-		if (Objects.isNull(dictionary)) {
+	public List<Dictionary> findDictionaryByUserId(Long id) {
+		List<DictionaryEntity> list = repository.findDictionaryByUserId(id);
+		if(list.isEmpty()) {
 			return null;
 		}
-		return dictionary;
+		return  DictionaryMapper.convertEntityToModelList(list);
 	}
 
 }
